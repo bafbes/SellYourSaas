@@ -174,6 +174,7 @@ if ($action == 'set')
 
 		dolibarr_set_const($db,"SELLYOURSAAS_NAME_RESERVED",GETPOST("SELLYOURSAAS_NAME_RESERVED"),'chaine',0,'',$conf->entity);
 		dolibarr_set_const($db,"SELLYOURSAAS_EMAIL_ADDRESSES_BANNED",GETPOST("SELLYOURSAAS_EMAIL_ADDRESSES_BANNED"),'chaine',0,'',$conf->entity);
+		dolibarr_set_const($db,"SELLYOURSAAS_DEPLOYMENT_PORT",GETPOST("SELLYOURSAAS_DEPLOYMENT_PORT"),'chaine',0,'',$conf->entity);
 
 		// Save images
 		$dirforimage=$conf->mycompany->dir_output.'/logos/';
@@ -884,6 +885,13 @@ print '<td>';
 print '<input type="text" name="SELLYOURSAAS_PASSWORD_FOR_SUPPORT" value="'.$conf->global->SELLYOURSAAS_PASSWORD_FOR_SUPPORT.'">';
 print '</td>';
 print '<td><span class="opacitymedium">Password to use to create a support user account on customer instances</span></td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>'.$langs->trans("DeploymentPort").'</td>';
+print '<td>';
+print '<input type="text" name="SELLYOURSAAS_DEPLOYMENT_PORT" value="'.$conf->global->SELLYOURSAAS_DEPLOYMENT_PORT.'">';
+print '</td>';
+print '<td><span class="opacitymedium">Port to use on deployment server</span></td>';
 print '</tr>';
 
 print '</table>';

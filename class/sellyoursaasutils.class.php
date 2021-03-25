@@ -3571,7 +3571,7 @@ class SellYourSaasUtils
     			// Execute remote action
     			if (! $error)
     			{
-    			    $urltoget='http://'.$serverdeployment.':8080/'.$remoteaction.'?'.urlencode($commandurl);
+    			    $urltoget='http://'.$serverdeployment.':'.$conf->global->SELLYOURSAAS_DEPLOYMENT_PORT.'/'.$remoteaction.'?'.urlencode($commandurl);
 	    			include_once DOL_DOCUMENT_ROOT.'/core/lib/geturl.lib.php';
 	    			$retarray = getURLContent($urltoget, 'GET', '', 0, array(), array('http', 'https'), 2);   // Timeout is defined before
 
