@@ -540,3 +540,4 @@ SELLYOURSAAS_GETIPINTEL_EMAIL=Clé API (e-mail) pour utiliser GetIPIntelservice 
 SELLYOURSAAS_IPQUALITY_KEY=Clé API pour utiliser IPQualityScore (utilisation IP TOR)
 IHaveAVATID=J'ai un numéro de TVA
 DeploymentPort=Port à utiliser sur le serveur de déploiement
+DOLIBARR-SUBSCRIPTION-TEXT=Créez dans cette page votre instance de la dernière version de Dolibarr. Vous aurez ensuite une période d'essai de 15 jours dans laquelle :<br>- Vous pourrez tester Dolibarr avec tous ses modules standards.<br>- Vous pourrez sélectionner tous les modules de Ab1 Consulting à joindre à votre installation. <br>- Recevoir le support gratuit de Ab1 Consulting concernant votre installation.
