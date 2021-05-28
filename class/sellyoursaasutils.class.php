@@ -1000,7 +1000,7 @@ class SellYourSaasUtils
 
     		// Correct the amount according to unit of currency
     		// See https://support.stripe.com/questions/which-zero-decimal-currencies-does-stripe-support
-    		$arrayzerounitcurrency=array('BIF', 'CLP', 'DJF', 'GNF', 'JPY', 'KMF', 'KRW', 'MGA', 'PYG', 'RWF', 'VND', 'VUV', 'XAF', 'XOF', 'XPF');
+    		$arrayzerounitcurrency=array('BIF', 'CLP', 'DJF', 'GNF', 'JPY', 'KMF', 'KRW', 'MGA', 'PYG', 'RWF','UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF');
     		$amountstripe=$amounttopay;
     		if (! in_array($currency, $arrayzerounitcurrency)) $amountstripe=$amountstripe * 100;
 
