@@ -2652,7 +2652,6 @@ class SellYourSaasUtils
 						}
 					}
 				}
-    			$ifetchservice++;
     		}
     	}
     	else
