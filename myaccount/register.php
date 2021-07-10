@@ -651,13 +651,9 @@ if (empty($_COOKIE[$cookieregistrationa])) setcookie($cookieregistrationa, 1, 0,
 
           <section id="formActions">
 			<?php
-			$urlfortermofuse = '';
-			if ($conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME == 'dolicloud.com')
-			{
-				$urlfortermofuse = 'https://www.'.$conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME.'/en-terms-and-conditions.php';
-				if (preg_match('/^fr/i', $langs->defaultlang)) $urlfortermofuse = 'https://www.'.$conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME.'/fr-conditions-utilisations.php';
-				if (preg_match('/^es/i', $langs->defaultlang)) $urlfortermofuse = 'https://www.'.$conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME.'/es-terminos-y-condiciones.php';
-			}
+            $urlfortermofuse = 'https://www.' . $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME . '/en-terms-and-conditions.php';
+            if (preg_match('/^fr/i', $langs->defaultlang)) $urlfortermofuse = 'https://www.' . $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME . '/fr-conditions-utilisations.php';
+            if (preg_match('/^es/i', $langs->defaultlang)) $urlfortermofuse = 'https://www.' . $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME . '/es-terminos-y-condiciones.php';
 			if ($urlfortermofuse)
 			{
 			?>
