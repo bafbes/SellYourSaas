@@ -175,6 +175,7 @@ if ($action == 'set')
 		dolibarr_set_const($db,"SELLYOURSAAS_NAME_RESERVED",GETPOST("SELLYOURSAAS_NAME_RESERVED"),'chaine',0,'',$conf->entity);
 		dolibarr_set_const($db,"SELLYOURSAAS_EMAIL_ADDRESSES_BANNED",GETPOST("SELLYOURSAAS_EMAIL_ADDRESSES_BANNED"),'chaine',0,'',$conf->entity);
 		dolibarr_set_const($db,"SELLYOURSAAS_DEPLOYMENT_PORT",GETPOST("SELLYOURSAAS_DEPLOYMENT_PORT"),'chaine',0,'',$conf->entity);
+		dolibarr_set_const($db,"SELLYOURSAAS_MANDATORY_PHONE",GETPOST("SELLYOURSAAS_MANDATORY_PHONE"),'chaine',0,'',$conf->entity);
 
 		// Save images
 		$dirforimage=$conf->mycompany->dir_output.'/logos/';
@@ -808,6 +809,24 @@ if ($conf->use_javascript_ajax)
 //print $form->selectyesno('SELLYOURSAAS_ALLOW_RESELLER_PROGRAM', $allowresellerprogram, 1);
 print '</td>';
 print '<td></td>';
+print '</tr>';
+
+// SELLYOURSAAS_MANDATORY_PHONE
+print '<tr class="oddeven"><td>'.$langs->trans("SELLYOURSAAS_MANDATORY_PHONE").'</td>';
+print '<td>';
+if ($conf->use_javascript_ajax)
+{
+	print ajax_constantonoff('SELLYOURSAAS_MANDATORY_PHONE', array(), null, 0, 0, 0);
+} else {
+	if (empty($conf->global->SELLYOURSAAS_MANDATORY_PHONE))
+	{
+		print '<a href="'.$_SERVER['PHP_SELF'].'?action=set_SELLYOURSAAS_MANDATORY_PHONE">'.img_picto($langs->trans("Disabled"), 'off').'</a>';
+	} else {
+		print '<a href="'.$_SERVER['PHP_SELF'].'?action=SELLYOURSAAS_MANDATORY_PHONE">'.img_picto($langs->trans("Enabled"), 'on').'</a>';
+	}
+}
+print '</td>';
+print '<td><span class="opacitymedium">Set to yes to add a mandatory field "Phone" on the subscription page.</td>';
 print '</tr>';
 
 print '</table>';

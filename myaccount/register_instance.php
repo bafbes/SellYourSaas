@@ -115,6 +115,7 @@ if (empty($user->id))
 $action = GETPOST('action','alpha');
 $orgname = ucfirst(trim(GETPOST('orgName','alpha')));
 $email = trim(GETPOST('username','alpha'));
+$phone = trim(GETPOST('phone','alpha'));
 $domainemail = preg_replace('/^.*@/', '', $email);
 $password = trim(GETPOST('password','alpha'));
 $password2 = trim(GETPOST('password2','alpha'));
@@ -303,6 +304,7 @@ else                    // When we deploy from the register.php page
 	if (! preg_match('/\?/', $newurl)) $newurl.='?';
 	if (! preg_match('/orgName/i', $newurl)) $newurl.='&orgName='.urlencode($orgname);
 	if (! preg_match('/username/i', $newurl)) $newurl.='&username='.urlencode($email);
+	if (! preg_match('/phone/i', $newurl)) $newurl.='&phone='.urlencode($phone);
 	if (! preg_match('/address_country/i', $newurl)) $newurl.='&address_country='.urlencode($country_code);
 	if (! preg_match('/sldAndSubdomain/i', $sldAndSubdomain)) $newurl.='&sldAndSubdomain='.urlencode($sldAndSubdomain);
 	if (! preg_match('/tldid/i', $tldid)) $newurl.='&tldid='.urlencode($tldid);
@@ -349,12 +351,24 @@ else                    // When we deploy from the register.php page
 		header("Location: ".$newurl);
 		exit(-1);
 	}
-	if (! isValidEmail($email))
-	{
-		setEventMessages($langs->trans("ErrorBadEMail"), null, 'errors');
-		header("Location: ".$newurl);
-		exit(-1);
-	}
+    if (! isValidEmail($email))
+    {
+        setEventMessages($langs->trans("ErrorBadEMail"), null, 'errors');
+        header("Location: ".$newurl);
+        exit(-1);
+    }
+    if (!empty($conf->global->SELLYOURSAAS_MANDATORY_PHONE)) {
+        if (empty($phone)) {
+            setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Phone")), null, 'errors');
+            header("Location: " . $newurl);
+            exit(-1);
+        }
+        if (!isValidPhone($phone)) {
+            setEventMessages($langs->trans("ErrorBadFormat"). ' : '.$langs->trans("Phone"), null, 'errors');
+            header("Location: " . $newurl);
+            exit(-1);
+        }
+    }
 	if (function_exists('isValidMXRecord') && isValidMXRecord($domainemail) == 0)
 	{
 	    dol_syslog("Try to register with a bad value for email domain : ".$domainemail);
@@ -776,6 +790,7 @@ else
 
 	$tmpthirdparty->name = $orgname;
 	$tmpthirdparty->email = $email;
+	$tmpthirdparty->phone = $phone;
 	$tmpthirdparty->client = 2;
 	$tmpthirdparty->tva_assuj = 1;
 	$tmpthirdparty->default_lang = $langs->defaultlang;

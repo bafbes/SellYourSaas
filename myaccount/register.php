@@ -466,6 +466,18 @@ if (empty($_COOKIE[$cookieregistrationa])) setcookie($cookieregistrationa, 1, 0,
             </div>
 			<?php
 			}
+			if (!empty($conf->global->SELLYOURSAAS_MANDATORY_PHONE)){
+			?>
+            <div class="control-group  required">
+            	<label class="control-label" for="username" trans="1"><?php echo $langs->trans("Phone") ?></label>
+            	<div class="controls">
+            		<input type="text"<?php echo $disabled; ?> name="phone" autofocus value="<?php echo GETPOST('phone','alpha'); ?>" required="" id="phone" />
+
+            	</div>
+            </div>
+			<?php
+            }
+
 			if (empty($reusecontractid))
 			{
 			?>
