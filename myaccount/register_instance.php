@@ -99,47 +99,64 @@ $langs->loadLangs(array("main","companies","sellyoursaas@sellyoursaas","errors")
 $langsen->loadLangs(array("main","companies","sellyoursaas@sellyoursaas","errors"));
 
 // Force user
-if (empty($user->id))
-{
-	$user->fetch($conf->global->SELLYOURSAAS_ANONYMOUSUSER);
-	// Set $user to the anonymous user
-	if (empty($user->id))
-	{
-		dol_print_error_email('SETUPANON', 'Error setup of module not complete or wrong. Missing the anonymous user.', null, 'alert alert-error');
-		exit(-1);
-	}
+if (empty($user->id)) {
+    $user->fetch($conf->global->SELLYOURSAAS_ANONYMOUSUSER);
+    // Set $user to the anonymous user
+    if (empty($user->id)) {
+        dol_print_error_email('SETUPANON', 'Error setup of module not complete or wrong. Missing the anonymous user.', null, 'alert alert-error');
+        exit(-1);
+    }
 
-	$user->getrights();
+    $user->getrights();
 }
 
-$action = GETPOST('action','alpha');
-$orgname = ucfirst(trim(GETPOST('orgName','alpha')));
-$email = trim(GETPOST('username','alpha'));
-$phone = trim(GETPOST('phone','alpha'));
-$domainemail = preg_replace('/^.*@/', '', $email);
-$password = trim(GETPOST('password','alpha'));
-$password2 = trim(GETPOST('password2','alpha'));
-$country_code = trim(GETPOST('address_country','alpha'));
-$sldAndSubdomain = trim(GETPOST('sldAndSubdomain','alpha'));
-$tldid = trim(GETPOST('tldid','alpha'));
-$optinmessages = (GETPOST('optinmessages','aZ09') == '1' ? 1 : 0);
+$codevalid = GETPOST('codevalid');
+$reusesocid = GETPOST('reusesocid', 'int');
+$plan = GETPOST('plan', 'alpha');
+$productref = (GETPOST('productref', 'alpha') ? GETPOST('productref', 'alpha') : ($plan ? $plan : ''));
+if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && !empty($codevalid)) {
+    //appel avec url de création d'instance
+    $tmpsoc = new Societe($db);
+    $tmpsoc->fetch($reusesocid);
+    $orgname = $tmpsoc->name;
+    $email = $tmpsoc->email;
+    $phone = $tmpsoc->phone;
+    $domainemail = preg_replace('/^.*@/', '', $email);
+    $password = $password2 = $tmpsoc->array_options['options_oldpassword'];
+    $country_code = $tmpsoc->country_code;;
+    $sldAndSubdomain = trim(ucfirst(strtolower(str_replace(' ', '', $orgname))));
+    $tldid = '.'.$conf->global->SELLYOURSAAS_SUB_DOMAIN_NAMES;//A changer si plusieurs domaines de déploiement
+    $optinmessages = $tmpsoc->array_options['options_optinmessages'];
+}
 
-$origin = GETPOST('origin','aZ09');
-$partner=GETPOST('partner','int');
-$partnerkey=GETPOST('partnerkey','alpha');		// md5 of partner name_alias
-$custmourl = '';
+else {
 
-$fromsocid=GETPOST('fromsocid','int');
-$reusecontractid = GETPOST('reusecontractid','int');
-$reusesocid = GETPOST('reusesocid','int');
-$disablecustomeremail = GETPOST('disablecustomeremail','alpha');
+    $action = GETPOST('action','alpha');
+    $orgname = ucfirst(trim(GETPOST('orgName','alpha')));
+    $email = trim(GETPOST('username','alpha'));
+    $phone = trim(GETPOST('phone','alpha'));
+    $domainemail = preg_replace('/^.*@/', '', $email);
+    $password = trim(GETPOST('password','alpha'));
+    $password2 = trim(GETPOST('password2','alpha'));
+    $country_code = trim(GETPOST('address_country','alpha'));
+    $sldAndSubdomain = trim(GETPOST('sldAndSubdomain','alpha'));
+    $tldid = trim(GETPOST('tldid','alpha'));
+    $optinmessages = (GETPOST('optinmessages','aZ09') == '1' ? 1 : 0);
 
-$service=GETPOST('service','int');
-$productid=GETPOST('service','int');
-$plan=GETPOST('plan','alpha');
-$productref=(GETPOST('productref','alpha')?GETPOST('productref','alpha'):($plan?$plan:''));
-$extcss=GETPOST('extcss','alpha');
+    $origin = GETPOST('origin','aZ09');
+    $partner=GETPOST('partner','int');
+    $partnerkey=GETPOST('partnerkey','alpha');		// md5 of partner name_alias
+    $custmourl = '';
 
+    $fromsocid=GETPOST('fromsocid','int');
+    $reusecontractid = GETPOST('reusecontractid','int');
+    $disablecustomeremail = GETPOST('disablecustomeremail','alpha');
+
+    $service=GETPOST('service','int');
+    $productid=GETPOST('service','int');
+    $extcss=GETPOST('extcss','alpha');
+
+}
 // If ran from command line
 if (substr($sapi_type, 0, 3) == 'cli') {
 	$productref = $argv[1];
@@ -670,7 +687,7 @@ else
 				exit(-1);
 			}
 		} else {
-			if ($thirdpartyidinsession != $reusesocid) {
+			if ($thirdpartyidinsession != $reusesocid && empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION)) {
 				dol_syslog("Instance creation blocked for ".$remoteip." - Try to create instance for thirdparty id = ".$reusesocid." when id in session is ".$thirdpartyidinsession);
 				setEventMessages($langs->trans("ErrorInvalidReuseIDSurelyAHackAttempt"), null, 'errors');
 				header("Location: index.php");
@@ -837,24 +854,30 @@ else
 		$langs = $langsen;
 
 		$tmpthirdparty->code_client = -1;
-		if ($productref == 'none')	// If reseller
-		{
-			$tmpthirdparty->code_fournisseur = -1;
-		}
-		if ($partner > 0) $tmpthirdparty->parent = $partner;		// Add link to parent/reseller
+        if ($productref == 'none')    // If reseller
+        {
+            $tmpthirdparty->code_fournisseur = -1;
+        }
+        if ($partner > 0) $tmpthirdparty->parent = $partner;        // Add link to parent/reseller
 
-		$result = $tmpthirdparty->create($user);
-		if ($result <= 0)
-		{
-			$db->rollback();
-			setEventMessages($tmpthirdparty->error, $tmpthirdparty->errors, 'errors');
-			header("Location: ".$newurl);
-			exit(-1);
-		}
+        if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION))//Création du code de validation du nouveau client
+        {
+            $codevalid = base64_encode(random_bytes(32));
+            $tmpthirdparty->array_options['options_code_validation'] = $codevalid;
+            $tmpthirdparty->array_options['options_oldpassword'] = $password;
+        }
 
-		// Restore lang to user/visitor language
-		$langs = $savlangs;
-	}
+        $result = $tmpthirdparty->create($user);
+        if ($result <= 0) {
+            $db->rollback();
+            setEventMessages($tmpthirdparty->error, $tmpthirdparty->errors, 'errors');
+            header("Location: " . $newurl);
+            exit(-1);
+        }
+
+        // Restore lang to user/visitor language
+        $langs = $savlangs;
+    }
 
 	if (! empty($conf->global->SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG))
 	{
@@ -872,12 +895,42 @@ else
 		$db->rollback();
 		dol_print_error_email('SETUPTAG', 'Setup of module not complete. The default customer tag is not defined.', null, 'alert alert-error');
 		exit(-1);
-	}
+    }
 
-	if ($productref == 'none')
-	{
-		if (! empty($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG))
-		{
+    if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && (substr($sapi_type, 0, 3) != 'cli') && empty($_GET['codevalid']))//Envoi de mail et affichage de page d'information.
+    {
+// Send email to customer
+        $sellyoursaasname = $conf->global->SELLYOURSAAS_NAME;
+        $sellyoursaasemailsupervision = $conf->global->SELLYOURSAAS_SUPERVISION_EMAIL;
+        $sellyoursaasemailnoreply = $conf->global->SELLYOURSAAS_NOREPLY_EMAIL;
+
+        $domainname = getDomainFromURL($_SERVER['SERVER_NAME'], 1);
+        $constforaltname = 'SELLYOURSAAS_NAME_FORDOMAIN-' . $domainname;
+        $constforaltemailsupervision = 'SELLYOURSAAS_SUPERVISION_EMAIL-' . $domainname;
+        $constforaltemailnoreply = 'SELLYOURSAAS_NOREPLY_EMAIL-' . $domainname;
+        if (!empty($conf->global->$constforaltname)) {
+            $sellyoursaasdomain = $domainname;
+            $sellyoursaasname = $conf->global->$constforaltname;
+            $sellyoursaasemailsupervision = $conf->global->$constforaltemailsupervision;
+            $sellyoursaasemailnoreply = $conf->global->$constforaltemailnoreply;
+        }
+
+        $to = $email;
+        $lien = $conf->global->SELLYOURSAAS_ACCOUNT_URL."/register_instance.php?reusesocid=$tmpthirdparty->id&codevalid=$codevalid&productref=$productref";
+        // We send email but only if not in Command Line mode
+        dol_syslog("Instance creation confirm, send email to customer (copy supervision)", LOG_ERR);
+
+        $email = new CMailFile('Instance creation confirm - ' . dol_print_date(dol_now(), 'dayhourrfc'), $to, $sellyoursaasemailnoreply,
+            $langs->trans("confirm_account_and_instance_creation") . " :<br>\n <a href='$lien'>$lien</a><br>\n", array(), array(), array(), $sellyoursaasemailsupervision, '', 0, 1, '', '', '', '', 'emailing');
+        $email->sendfile();
+        print $langs->trans('A_validation_mail_has_been_sent');
+		$db->commit();
+        exit(1);
+
+    }
+
+    if ($productref == 'none') {
+        if (!empty($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG)) {
 			$tmpthirdparty->name_alias = dol_sanitizeFileName($tmpthirdparty->name);
 			$result = $tmpthirdparty->setCategories(array($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG => $conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG), 'supplier');
 			if ($result < 0)

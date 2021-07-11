@@ -176,6 +176,7 @@ if ($action == 'set')
 		dolibarr_set_const($db,"SELLYOURSAAS_EMAIL_ADDRESSES_BANNED",GETPOST("SELLYOURSAAS_EMAIL_ADDRESSES_BANNED"),'chaine',0,'',$conf->entity);
 		dolibarr_set_const($db,"SELLYOURSAAS_DEPLOYMENT_PORT",GETPOST("SELLYOURSAAS_DEPLOYMENT_PORT"),'chaine',0,'',$conf->entity);
 		dolibarr_set_const($db,"SELLYOURSAAS_MANDATORY_PHONE",GETPOST("SELLYOURSAAS_MANDATORY_PHONE"),'chaine',0,'',$conf->entity);
+		dolibarr_set_const($db,"SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION",GETPOST("SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION"),'chaine',0,'',$conf->entity);
 
 		// Save images
 		$dirforimage=$conf->mycompany->dir_output.'/logos/';
@@ -544,7 +545,7 @@ print '</td>';
 print '<td><span class="opacitymedium">&lt;script&gt;Your conversion trackers&lt;/script&gt;</span></td>';
 print '</tr>';
 
-// Other
+// Automation
 
 print '<tr class="liste_titre"><td>'.$langs->trans("Automation").'</td>';
 print '<td>';
@@ -827,6 +828,24 @@ if ($conf->use_javascript_ajax)
 }
 print '</td>';
 print '<td><span class="opacitymedium">Set to yes to add a mandatory field "Phone" on the subscription page.</td>';
+print '</tr>';
+
+// SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION
+print '<tr class="oddeven"><td>'.$langs->trans("SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION").'</td>';
+print '<td>';
+if ($conf->use_javascript_ajax)
+{
+	print ajax_constantonoff('SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION', array(), null, 0, 0, 0);
+} else {
+	if (empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION))
+	{
+		print '<a href="'.$_SERVER['PHP_SELF'].'?action=set_SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION">'.img_picto($langs->trans("Disabled"), 'off').'</a>';
+	} else {
+		print '<a href="'.$_SERVER['PHP_SELF'].'?action=SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION">'.img_picto($langs->trans("Enabled"), 'on').'</a>';
+	}
+}
+print '</td>';
+print '<td><span class="opacitymedium">Set to yes to validate mails by url sent by mail from the subscription page.</td>';
 print '</tr>';
 
 print '</table>';
