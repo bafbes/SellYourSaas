@@ -596,7 +596,6 @@ OptinForCommercialMessages=Optez pour les messages commerciaux
 OptinForCommercialMessagesOnMyAccount=J'accepte de recevoir des messages de %s y compris des newsletters, des offres promotionnelles et commerciales.
 SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_ENABLED=Utilisez le service DisposableEmail pour détecter les e-mails malveillants
 SELLYOURSAAS_GETIPINTEL_ON=Utilisez le service gratuit GetIPIntel pour détecter les VPN
-SELLYOURSAAS_GETIPINTEL_EMAIL=Clé API (e-mail) pour utiliser le service GetIPIntel
 SELLYOURSAAS_IPQUALITY_ON=Utilisez le service IPQualityScore pour détecter TOR, les mauvais VPN ou les mauvais e-mails
 SELLYOURSAAS_API_KEY=Clé API à utiliser %s
 SELLYOURSAAS_EMAIL_ADDRESSES_BANNED=Liste des adresses e-mail ou noms de domaine que vous souhaitez refuser lors de l'enregistrement (séparés par des virgules)
@@ -609,7 +608,6 @@ ErrorInvalidReuseIDSurelyAHackAttempt=Réutilisation invalide d'un ID. Sûrement
 CSSForCustomerAndRegisterPages=CSS pour la page d'inscription et le tableau de bord des clients
 SecurityKeyForPublicPages=Clé de sécurité pour les endpoints de services
 SecurityOfRegistrations=Inscription (sécurité/options)
-IHaveAVATID=J'ai un numéro d'identification fiscale/TVA
 NoResourceToCountUsersFound=Cette instance ne contient aucun produit qui doit compter les utilisateurs de ressources
 GroupOfTicket=Catégorie
 DoNotUseDefaultStripeAccount=Avec un compte Stripe forcé
@@ -910,3 +908,16 @@ TIGRP-TECHISSUE-OTHER=Autre (bug, erreur, instance inaccessible)
 DefaultSellYourSaasCatLabel=Services Cloud
 DefaultSellYourSaasCustomerCatLabel=Prospects or Customers Cloud
 DefaultSellYourSaasSupplierCatLabel=Resellers Cloud
+SELLYOURSAAS_GETIPINTEL_EMAIL=Clé API (e-mail) pour utiliser GetIPIntelservice (probabilité IP VPN)
+SELLYOURSAAS_IPQUALITY_KEY=Clé API pour utiliser IPQualityScore (utilisation IP TOR)
+IHaveAVATID=J'ai un numéro de TVA
+DeploymentPort=Port à utiliser sur le serveur de déploiement
+DOLIBARR-SUBSCRIPTION-TEXT=Créez dans cette page votre instance de la dernière version de Dolibarr. Vous aurez ensuite une période d'essai d'un mois (30 jours), dans lequel vous pourrez tester Dolibarr avec tous ses modules standards et recevoir le support gratuit de Ab1 Consulting concernant votre installation.<br><br>Si vous souhaitez profiter de nos tarifs  de lancement exceptionnels sur une plus longue période et vous protéger contre d'éventuels changements tarifaires, il faut faire le paiement à travers notre boutique en mettant le nombre de mois souhaité dans le champs quantité sur le lien suivant : <a href="https://01consulting.eu/fr/23-formule-standard.html" target="_blank">Formule Dolibarr1301 Standard</a><br><br><span style="color:green"><b> L'installation de votre instance prend moins de 10 secondes. <br>Merci de patienter ...</b> </span>
+
+DOLIBARR-SUBSCRIPTION-TEXT-P=Créez dans cette page votre instance de la dernière version de Dolibarr avec les dernières versions des modules de Ab1 Consulting. Vous aurez ensuite une période d'essai d'un mois (30 jours), dans lequel :<br>- Vous pourrez tester Dolibarr avec tous ses modules standards.<br>- Vous pourrez tester tous les modules de Ab1 Consulting à joindre à votre installation. <br>- Recevoir le support gratuit de Ab1 Consulting concernant votre installation.<br><br>Si vous souhaitez profiter de nos tarifs de lancement exceptionnels sur une plus longue période et vous protéger contre d'éventuels changements tarifaires, il faut faire le paiement à travers notre boutique en mettant le nombre de mois souhaité dans le champs quantité sur le lien suivant : <a href="https://01consulting.eu/fr/25-formule-pro.html" target="_blank">Formule Dolibarr1301 Pro</a><br><br><span style="color:green"><b> L'installation de votre instance prend moins de 10 secondes. <br>Merci de patienter ...</b> </span>
+
+DOLIBARR-SUBSCRIPTION-TEXT-C=Créez dans cette page votre instance de la dernière version de Dolibarr avec accès SSH. Vous aurez ensuite une période d'essai d'un mois (30 jours), dans lequel vous pourrez tester Dolibarr avec tous ses modules standards et y installer des modules tiers, y compris des modules de Ab Consulting. Vous pourrez ensuite, recevoir le support gratuit de Ab1 Consulting concernant votre installation durant toute votre période d'essai.<br><br>Si vous souhaitez profiter de nos tarifs de lancement exceptionnels sur une plus longue période et vous protéger contre d'éventuels changements tarifaires, il faut faire le paiement à travers notre boutique en mettant le nombre de mois souhaité dans le champs quantité sur le lien suivant : <a href="https://01consulting.eu/fr/21-formule-custom.html" target="_blank">Formule Dolibarr1301 Custom</a><br><br><span style="color:green"><b> L'installation de votre instance prend moins de 10 secondes. <br>Merci de patienter ...</b> </span>
+SELLYOURSAAS_MANDATORY_PHONE=Définir sur oui pour ajouter un champ obligatoire "Téléphone" sur la page d'abonnement.
+SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION=Définir sur oui pour valider les mails par url envoyés par mail depuis la page d'abonnement
+confirm_account_and_instance_creation=Veuillez confirmer la création de votre compte et de votre instance.
+A_validation_mail_has_been_sent=Un mail de validation a été envoyé à l'adresse que vous avez indiquée. Veuillez cliquer sur le lien dans l'e-mail pour confirmer la création de votre compte et de votre instance.

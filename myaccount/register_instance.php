@@ -167,9 +167,10 @@ if (empty($user->id)) {
 		exit(-1);
 	}
 
-	$user->getrights();
+    $user->getrights();
 }
 
+//<<<<<<< HEAD
 $action = GETPOST('action', 'alpha');
 $orgname = dol_trunc(ucfirst(trim(GETPOST('orgName', 'alpha'))), 250, 'right', 'UTF-8', 1);
 $phone   = dol_trunc(ucfirst(trim(GETPOST('phone', 'alpha'))), 20, 'right', 'UTF-8', 1);
@@ -203,7 +204,55 @@ if (empty($extcss)) {
 } elseif ($extcss == 'generic') {
 	$extcss = 'dist/css/myaccount.css';
 }
+//=======
+$codevalid = GETPOST('codevalid');
+$reusesocid = GETPOST('reusesocid', 'int');
+$plan = GETPOST('plan', 'alpha');
+$productref = (GETPOST('productref', 'alpha') ? GETPOST('productref', 'alpha') : ($plan ? $plan : ''));
+if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && !empty($codevalid)) {
+    //appel avec url de création d'instance
+    $tmpsoc = new Societe($db);
+    $tmpsoc->fetch($reusesocid);
+    $orgname = $tmpsoc->name;
+    $email = $tmpsoc->email;
+    $phone = $tmpsoc->phone;
+    $domainemail = preg_replace('/^.*@/', '', $email);
+    $password = $password2 = $tmpsoc->array_options['options_oldpassword'];
+    $country_code = $tmpsoc->country_code;;
+    if(empty($sldAndSubdomain)) $sldAndSubdomain = trim(ucfirst(strtolower(str_replace(' ', '', $orgname))));
+    $tldid = '.'.$conf->global->SELLYOURSAAS_SUB_DOMAIN_NAMES;//A changer si plusieurs domaines de déploiement
+    $optinmessages = $tmpsoc->array_options['options_optinmessages'];
+}
 
+else {
+
+    $action = GETPOST('action','alpha');
+    $orgname = ucfirst(trim(GETPOST('orgName','alpha')));
+    $email = trim(GETPOST('username','alpha'));
+    $phone = trim(GETPOST('phone','alpha'));
+    $domainemail = preg_replace('/^.*@/', '', $email);
+    $password = trim(GETPOST('password','alpha'));
+    $password2 = trim(GETPOST('password2','alpha'));
+    $country_code = trim(GETPOST('address_country','alpha'));
+    $sldAndSubdomain = trim(GETPOST('sldAndSubdomain','alpha'));
+    $tldid = trim(GETPOST('tldid','alpha'));
+    $optinmessages = (GETPOST('optinmessages','aZ09') == '1' ? 1 : 0);
+
+    $origin = GETPOST('origin','aZ09');
+    $partner=GETPOST('partner','int');
+    $partnerkey=GETPOST('partnerkey','alpha');		// md5 of partner name_alias
+    $custmourl = '';
+//>>>>>>> 494a4bbe (SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION)
+
+    $fromsocid=GETPOST('fromsocid','int');
+    $reusecontractid = GETPOST('reusecontractid','int');
+    $disablecustomeremail = GETPOST('disablecustomeremail','alpha');
+
+    $service=GETPOST('service','int');
+    $productid=GETPOST('service','int');
+    $extcss=GETPOST('extcss','alpha');
+
+}
 // If ran from command line
 if (substr($sapi_type, 0, 3) == 'cli') {
 	$productref = $argv[1];
@@ -352,7 +401,7 @@ if ($reusecontractid) {
 		exit(246);
 	}
 
-	if ($productref != 'none' && empty($sldAndSubdomain)) {
+	if ($productref != 'none' && empty($sldAndSubdomain) && empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && empty($codevalid)) {
 		if (substr($sapi_type, 0, 3) != 'cli') {
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("NameForYourApplication")), null, 'errors');
 			header("Location: ".$newurl);
@@ -361,7 +410,7 @@ if ($reusecontractid) {
 		}
 		exit(245);
 	}
-	if ($productref != 'none' && strlen($sldAndSubdomain) >= 29) {
+	if ($productref != 'none' && strlen($sldAndSubdomain) >= 29 && empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && empty($codevalid)) {
 		if (substr($sapi_type, 0, 3) != 'cli') {
 			setEventMessages($langs->trans("ErrorFieldTooLong", $langs->transnoentitiesnoconv("NameForYourApplication")), null, 'errors');
 			header("Location: ".$newurl);
@@ -370,7 +419,7 @@ if ($reusecontractid) {
 		}
 		exit(244);
 	}
-	if ($productref != 'none' && ! preg_match('/^[a-zA-Z0-9\-]+$/', $sldAndSubdomain)) {		// Only a-z A-Z 0-9 and - . Note: - is removed by javascript part of register page.
+	if ($productref != 'none' && ! preg_match('/^[a-zA-Z0-9\-]+$/', $sldAndSubdomain) && empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && empty($codevalid)) {		// Only a-z A-Z 0-9 and - . Note: - is removed by javascript part of register page.
 		if (substr($sapi_type, 0, 3) != 'cli') {
 			setEventMessages($langs->trans("ErrorOnlyCharAZAllowedFor", $langs->transnoentitiesnoconv("NameForYourApplication")), null, 'errors');
 			header("Location: ".$newurl);
@@ -379,7 +428,7 @@ if ($reusecontractid) {
 		}
 		exit(243);
 	}
-	if ($productref != 'none' && empty($tldid)) {
+	if ($productref != 'none' && empty($tldid) && empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && empty($codevalid)) {
 		if (substr($sapi_type, 0, 3) != 'cli') {
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Subdomain")), null, 'errors');
 			header("Location: ".$newurl);
@@ -388,16 +437,16 @@ if ($reusecontractid) {
 		}
 		exit(242);
 	}
-	if (empty($password) || empty($password2)) {
+	if (empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && empty($codevalid) &&(empty($password) || empty($password2) )) {
 		if (substr($sapi_type, 0, 3) != 'cli') {
-			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Password")), null, 'errors');
+			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Password")) && empty($codevalid), null, 'errors');
 			header("Location: ".$newurl);
 		} else {
 			print $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Password"))."\n";
 		}
 		exit(241);
 	}
-	if ($password != $password2) {
+	if ($password != $password2 && empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && empty($codevalid)) {
 		if (substr($sapi_type, 0, 3) != 'cli') {
 			setEventMessages($langs->trans("ErrorPasswordMismatch"), null, 'errors');
 			header("Location: ".$newurl);
@@ -563,7 +612,6 @@ if ($reusecontractid) {
 		exit(-55);
 	}
 }
-
 
 
 /*
@@ -858,6 +906,7 @@ if ($reusecontractid) {
 		}
 
 		// Check that thirdparty is ok
+//<<<<<<< HEAD
 		if (substr($sapi_type, 0, 3) != 'cli') {
 			$thirdpartyidinsession = $_SESSION['dol_loginsellyoursaas'];
 			if ($fromsocid > 0) {
@@ -886,7 +935,7 @@ if ($reusecontractid) {
 					exit(-75);
 				}
 			} else {
-				if ($thirdpartyidinsession != $reusesocid) {
+				if ($thirdpartyidinsession != $reusesocid && empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION)) {
 					// Output the key "Instance creation blocked for"
 					dol_syslog("ErrorInvalidReuseIDSurelyAHackAttempt Instance creation blocked for ".$remoteip." - You tried to create instance for thirdparty id = ".$reusesocid." when id in session is ".$thirdpartyidinsession);
 
@@ -898,6 +947,9 @@ if ($reusecontractid) {
 					}
 					exit(-76);
 				}
+//=======
+		$thirdpartyidinsession = $_SESSION['dol_loginsellyoursaas'];
+//>>>>>>> 494a4bbe (SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION)
 			}
 		}
 
@@ -1101,12 +1153,19 @@ if ($reusecontractid) {
 		$langs = $langsen;
 
 		$tmpthirdparty->code_client = -1;
+
 		if ($productref == 'none') {	// If reseller
 			$tmpthirdparty->code_fournisseur = -1;
 		}
 		if ($partner > 0) {
 			$tmpthirdparty->parent = $partner;		// Add link to parent/reseller id with the id of partner explicitely into registration link
 		}
+
+        if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION))//Création du code de validation du nouveau client
+        {
+            $tmpthirdparty->array_options['options_code_validation'] = randomAdalphanumericString(32);
+            $tmpthirdparty->array_options['options_oldpassword'] = $password;
+        }
 
 		$result = $tmpthirdparty->create($user);
 		if ($result <= 0) {
@@ -1121,9 +1180,9 @@ if ($reusecontractid) {
 			exit(-91);
 		}
 
-		// Restore lang to user/visitor language
-		$langs = $savlangs;
-	}
+        // Restore lang to user/visitor language
+        $langs = $savlangs;
+    }
 
 	if (getDolGlobalString('SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG')) {
 		dol_syslog("register_instance.php We will set customer into the categroy");
@@ -1152,10 +1211,44 @@ if ($reusecontractid) {
 
 		dol_print_error_email('SETUPTAG', 'Setup of module not complete. The default customer tag is not defined.', null, 'alert alert-error');
 		exit(-1);
-	}
+    }
 
-	if ($productref == 'none') {
-		if (getDolGlobalString('SELLYOURSAAS_DEFAULT_RESELLER_CATEG')) {
+    if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && (substr($sapi_type, 0, 3) != 'cli') && empty(GETPOST('codevalid')))//Envoi de mail et affichage de page d'information.
+    {
+// Send email to customer
+        $codevalid =$tmpthirdparty->array_options['options_code_validation'] ;
+        $sellyoursaasname = $conf->global->SELLYOURSAAS_NAME;
+        $sellyoursaasemailsupervision = $conf->global->SELLYOURSAAS_SUPERVISION_EMAIL;
+        $sellyoursaasemailnoreply = $conf->global->SELLYOURSAAS_NOREPLY_EMAIL;
+
+        $domainname = getDomainFromURL($_SERVER['SERVER_NAME'], 1);
+        $constforaltname = 'SELLYOURSAAS_NAME_FORDOMAIN-' . $domainname;
+        $constforaltemailsupervision = 'SELLYOURSAAS_SUPERVISION_EMAIL-' . $domainname;
+        $constforaltemailnoreply = 'SELLYOURSAAS_NOREPLY_EMAIL-' . $domainname;
+        if (!empty($conf->global->$constforaltname)) {
+            $sellyoursaasdomain = $domainname;
+            $sellyoursaasname = $conf->global->$constforaltname;
+            $sellyoursaasemailsupervision = $conf->global->$constforaltemailsupervision;
+            $sellyoursaasemailnoreply = $conf->global->$constforaltemailnoreply;
+        }
+
+        $to = $email;
+        $lien = $conf->global->SELLYOURSAAS_ACCOUNT_URL."/install_instance.php?reusesocid=$tmpthirdparty->id&codevalid=$codevalid&productref=$productref&sldAndSubdomain=$sldAndSubdomain";
+        // We send email but only if not in Command Line mode
+        dol_syslog("Instance creation confirm, send email to customer (copy supervision)", LOG_ERR);
+
+        $email = new CMailFile('Instance creation confirm - ' . dol_print_date(dol_now(), 'dayhourrfc'), $to, $sellyoursaasemailnoreply,
+            $langs->trans("confirm_account_and_instance_creation") . " :<br>\n <a href='$lien'>$lien</a><br>\n", array(), array(), array(), $sellyoursaasemailsupervision, '', 0, 1, '', '', '', '', 'emailing');
+        $email->sendfile();
+        print $langs->trans('A_validation_mail_has_been_sent');
+		$db->commit();
+        exit(1);
+
+    }
+
+    if ($productref == 'none') {
+        if (!empty($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG)) {
+//>>>>>>> 494a4bbe (SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION)
 			$tmpthirdparty->name_alias = dol_sanitizeFileName($tmpthirdparty->name);
 			$result = $tmpthirdparty->setCategories(array($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG => getDolGlobalString('SELLYOURSAAS_DEFAULT_RESELLER_CATEG')), 'supplier');
 			if ($result < 0) {
@@ -1771,3 +1864,18 @@ llxFooter();
 
 // cli mode need an error return code
 exit($error);
+/** Retourne une chaine aléatoire équitablement distribuée sur les majuscules,miniscules et chiffres
+ * @param $n
+ * @return string
+ * @throws Exception
+ */
+function randomAdalphanumericString($n){
+	$s='';
+	for($i=0;$i<$n;$i++){
+		$r=random_int(1,5);
+		if($r>3)$s.=chr(random_int(65,90));
+		elseif($r>1) $s.=chr(random_int(97,122));
+		else $s.=chr(random_int(48,57));
+	}
+	return $s;
+}

@@ -885,6 +885,8 @@ class modSellYourSaas extends DolibarrModules
 		$resultx=$extrafields->addExtraField('stripeaccount', "StripeAccount", 'varchar', 197, '255', 'thirdparty', 0, 0, '', '', 1, '', -1, 'StripeAccountForCustomerHelp', '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$resultx=$extrafields->addExtraField('maxnbofinstances', "MaxNbOfInstances", 'int', 198, '3', 'thirdparty', 0, 0, '4', '', 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$resultx=$extrafields->addExtraField('spammer', "EvilUser", 'varchar', 300, '8', 'thirdparty', 0, 0, '', '', 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
+        $resultx=$extrafields->addExtraField('code_validation',                   "Code validation",  'varchar',199, '128', 'thirdparty', 0, 0, '',    '', 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', '$conf->sellyoursaas->enabled');
+        $resultx=$extrafields->addExtraField('valide',                                     "Validé",  'boolean',200,    '', 'thirdparty', 0, 0, 0,    '', 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', '$conf->sellyoursaas->enabled');
 		$arrayoptions=array(
 			'profit'=>'ProfitOrganization',
 			'nonprofit'=>'NonProfitOrganization'

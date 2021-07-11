@@ -1046,7 +1046,9 @@ if ($reshook >= 0) {
 			console.log("Update sldAndSubdomain field in register.php");
 			$(this).val( applyDomainConstraints( $(this).val() ) );
 		});
-
+<?php
+if(empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION)){
+    ?>
 		/* Sow hourglass */
 		$('#formregister').submit(function() {
 				console.log("We clicked on submit on register.php")
@@ -1059,6 +1061,9 @@ if ($reshook >= 0) {
 				return true;	/* Use return false to show the hourglass without submitting the page (for debug) */
 		});
 	});
+    <?php
+}
+?>
 </script>
 
 
