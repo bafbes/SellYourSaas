@@ -115,9 +115,21 @@ $reusesocid = GETPOST('reusesocid', 'int');
 $plan = GETPOST('plan', 'alpha');
 $productref = (GETPOST('productref', 'alpha') ? GETPOST('productref', 'alpha') : ($plan ? $plan : ''));
 if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && !empty($codevalid)) {
+
     //appel avec url de création d'instance
     $tmpsoc = new Societe($db);
     $tmpsoc->fetch($reusesocid);
+    if(!empty($tmpsoc->array_options['options_valide'])){
+        print $langs->trans("ErrorCustomerAlreadyValidated");
+        exit(-1);
+    }
+    if($tmpsoc->array_options['options_code_validation']!=$codevalid){
+        print $langs->trans("ErrorOnCodeValidation");
+        exit(-1);
+    }
+    $tmpsoc->array_options['options_valide']=1;
+    $tmpsoc->insertExtraFields();//validation du client
+
     $orgname = $tmpsoc->name;
     $email = $tmpsoc->email;
     $phone = $tmpsoc->phone;
