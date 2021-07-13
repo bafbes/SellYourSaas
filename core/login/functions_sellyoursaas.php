@@ -39,13 +39,19 @@ function check_user_password_sellyoursaas($usertotest, $passwordtotest, $entityt
 
 	$thirdparty = new Societe($db);
 	$result = $thirdparty->fetch(0, '', '', '', '', '', '', '', '', '', $usertotest);
-
 	if ($result <= 0)
 	{
 		$login='';
 		$langs->load("errors");
 		$_SESSION["dol_loginmesg"]=$langs->trans("ErrorBadLoginPassword");
 	}
+    elseif(!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && empty($thirdparty->array_options['options_valide'])){
+        $login='';
+        $langs->load("errors");
+        $langs->load("sellyoursaas@sellyoursaas");
+        $_SESSION["dol_loginmesg"]=$langs->trans("ErrorUserNotValidated");
+
+    }
 	else
 	{
 		//dol_syslog("thirdparty found with id=".$thirdparty->id);
