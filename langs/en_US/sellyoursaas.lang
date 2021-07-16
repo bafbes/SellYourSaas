@@ -561,5 +561,7 @@ SELLYOURSAAS_MANDATORY_PHONE=Set to yes to add a mandatory field "Phone" on the 
 SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION=Set to yes to validate mails by url sent by mail from the subscription page
 confirm_account_and_instance_creation=Please confirm your account and instance creation.
 A_validation_mail_has_been_sent=A validation mail has been sent to the adress you have indicated. Please click on the link in the mail to confirm your account and instance creation.
-ErrorOnCodeValidation=The validation code seems to be incorrect. Please, activate you account by clicking on the link in the received Email.
+A_validation_mail_has_been_sent1 = If you have not received any mail including in your spam box, please click on the following link to <a href="%s"> resend the registration email </a>ErrorOnCodeValidation=The validation code seems to be incorrect. Please, activate you account by clicking on the link in the received Email.
+A_validation_mail_has_been_sent2 = If you still cannot login, please contact us on:% s
 ErrorCustomerAlreadyValidated=Error : Your Customer acccount is Already Validated
+ErrorUserNotValidated=Error - User Not Validated

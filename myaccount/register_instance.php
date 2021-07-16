@@ -935,7 +935,9 @@ else
         $email = new CMailFile('Instance creation confirm - ' . dol_print_date(dol_now(), 'dayhourrfc'), $to, $sellyoursaasemailnoreply,
             $langs->trans("confirm_account_and_instance_creation") . " :<br>\n <a href='$lien'>$lien</a><br>\n", array(), array(), array(), $sellyoursaasemailsupervision, '', 0, 1, '', '', '', '', 'emailing');
         $email->sendfile();
-        print $langs->trans('A_validation_mail_has_been_sent');
+        print $langs->trans('A_validation_mail_has_been_sent')
+//        ."<br>\n".$langs->trans("A_validation_mail_has_been_sent1",$link1)."<br>\n".$langs->trans("A_validation_mail_has_been_sent2",$link2)
+        ;
 		$db->commit();
         exit(1);
 
