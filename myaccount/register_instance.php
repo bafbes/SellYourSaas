@@ -116,7 +116,7 @@ $plan = GETPOST('plan', 'alpha');
 $productref = (GETPOST('productref', 'alpha') ? GETPOST('productref', 'alpha') : ($plan ? $plan : ''));
 if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && !empty($codevalid)) {
 
-    //appel avec url de création d'instance
+    //appel depuis url de création d'instance avec les paramètres reusesocid,codevalid et productref en get
     $tmpsoc = new Societe($db);
     $tmpsoc->fetch($reusesocid);
     if(!empty($tmpsoc->array_options['options_valide'])){
@@ -909,7 +909,7 @@ else
 		exit(-1);
     }
 
-    if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && (substr($sapi_type, 0, 3) != 'cli') && empty($_GET['codevalid']))//Envoi de mail et affichage de page d'information.
+    if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && (substr($sapi_type, 0, 3) != 'cli') && empty($_GET['codevalid']) && empty($thirdpartyidinsession))//Envoi de mail et affichage de page d'information.
     {
 // Send email to customer
         $sellyoursaasname = $conf->global->SELLYOURSAAS_NAME;
