@@ -175,8 +175,6 @@ if ($action == 'set')
 		dolibarr_set_const($db,"SELLYOURSAAS_NAME_RESERVED",GETPOST("SELLYOURSAAS_NAME_RESERVED"),'chaine',0,'',$conf->entity);
 		dolibarr_set_const($db,"SELLYOURSAAS_EMAIL_ADDRESSES_BANNED",GETPOST("SELLYOURSAAS_EMAIL_ADDRESSES_BANNED"),'chaine',0,'',$conf->entity);
 		dolibarr_set_const($db,"SELLYOURSAAS_DEPLOYMENT_PORT",GETPOST("SELLYOURSAAS_DEPLOYMENT_PORT"),'chaine',0,'',$conf->entity);
-		dolibarr_set_const($db,"SELLYOURSAAS_MANDATORY_PHONE",GETPOST("SELLYOURSAAS_MANDATORY_PHONE"),'chaine',0,'',$conf->entity);
-		dolibarr_set_const($db,"SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION",GETPOST("SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION"),'chaine',0,'',$conf->entity);
 
 		// Save images
 		$dirforimage=$conf->mycompany->dir_output.'/logos/';
