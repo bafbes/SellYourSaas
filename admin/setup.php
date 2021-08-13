@@ -129,6 +129,7 @@ if ($action == 'set')
 		dolibarr_set_const($db,"SELLYOURSAAS_CONVERSION_FOOTER",GETPOST("SELLYOURSAAS_CONVERSION_FOOTER",'none'),'chaine',0,'',$conf->entity);
 		dolibarr_set_const($db,"SELLYOURSAAS_PUBLIC_KEY",GETPOST("SELLYOURSAAS_PUBLIC_KEY",'none'),'chaine',0,'',$conf->entity);
 
+		dolibarr_set_const($db,"SELLYOURSAAS_NBDAYS_TRIAL",GETPOST("SELLYOURSAAS_NBDAYS_TRIAL",'int'),'chaine',0,'',$conf->entity);
 		dolibarr_set_const($db,"SELLYOURSAAS_NBDAYS_BEFORE_TRIAL_END_FOR_SOFT_ALERT",GETPOST("SELLYOURSAAS_NBDAYS_BEFORE_TRIAL_END_FOR_SOFT_ALERT",'int'),'chaine',0,'',$conf->entity);
 		dolibarr_set_const($db,"SELLYOURSAAS_NBDAYS_BEFORE_TRIAL_END_FOR_HARD_ALERT",GETPOST("SELLYOURSAAS_NBDAYS_BEFORE_TRIAL_END_FOR_HARD_ALERT",'int'),'chaine',0,'',$conf->entity);
 
@@ -574,6 +575,13 @@ if ($conf->global->SELLYOURSAAS_HASHALGOFORPASSWORD != 'password_hash') {
 	print '<td><span class="opacitymedium">Salt use to build substitution keys __APPPASSWORDxxxSALTED__</span></td>';
 	print '</tr>';
 }
+
+print '<tr class="oddeven"><td>'.$langs->trans("SELLYOURSAAS_NBDAYS_TRIAL").'</td>';
+print '<td>';
+print '<input class="maxwidth50" type="text" name="SELLYOURSAAS_NBDAYS_TRIAL" value="'.$conf->global->SELLYOURSAAS_NBDAYS_TRIAL.'">';
+print '</td>';
+print '<td><span class="opacitymedium">7</span></td>';
+print '</tr>';
 
 print '<tr class="oddeven"><td>'.$langs->trans("SELLYOURSAAS_NBDAYS_BEFORE_TRIAL_END_FOR_SOFT_ALERT").'</td>';
 print '<td>';

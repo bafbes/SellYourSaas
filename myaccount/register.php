@@ -395,7 +395,7 @@ if (empty($_COOKIE[$cookieregistrationa])) setcookie($cookieregistrationa, 1, 0,
 			<?php
 			if (! empty($tmpproduct->array_options['options_register_text'])) {
 				print '<!-- show custom registration text of service -->';
-			    print '<div class="register_text">'.$langs->trans($tmpproduct->array_options['options_register_text']).'</div>';
+			    print '<div class="register_text">'.$langs->trans($tmpproduct->array_options['options_register_text'],$conf->global->SELLYOURSAAS_NBDAYS_TRIAL).'</div>';
 			}
 			?>
 
