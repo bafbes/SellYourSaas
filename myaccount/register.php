@@ -640,7 +640,7 @@ if (empty($_COOKIE[$cookieregistrationa])) setcookie($cookieregistrationa, 1, 0,
 			<?php if (! empty($conf->global->SELLYOURSAAS_ENABLE_OPTINMESSAGES)) { ?>
 			<br>
 	        <section id="optinmessagesid">
-				<input type="checkbox" id="optinmessages" name="optinmessages" class="valignmiddle inline" style="margin-top: 0" value="1" checked>
+				<input type="checkbox" id="optinmessages" name="optinmessages" class="valignmiddle inline" style="margin-top: 0" value="1">
 				<label for="optinmessages" class="valignmiddle small inline"><?php echo $langs->trans("OptinForCommercialMessagesOnMyAccount", $sellyoursaasname); ?></label>
 			</section>
 			<?php } ?>
@@ -651,9 +651,9 @@ if (empty($_COOKIE[$cookieregistrationa])) setcookie($cookieregistrationa, 1, 0,
 
           <section id="formActions">
 			<?php
-            $urlfortermofuse = 'https://www.' . $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME . '/terms-and-conditions-en.php';
-            if (preg_match('/^fr/i', $langs->defaultlang)) $urlfortermofuse = 'https://www.' . $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME . '/terms-and-conditions-fr.php';
-            if (preg_match('/^es/i', $langs->defaultlang)) $urlfortermofuse = 'https://www.' . $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME . '/terms-and-conditions-es.php';
+            $urlfortermofuse = 'https://www.' . $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME . '/en-terms-and-conditions.php';
+            if (preg_match('/^fr/i', $langs->defaultlang)) $urlfortermofuse = 'https://www.' . $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME . '/fr-conditions-utilisations.php';
+            if (preg_match('/^es/i', $langs->defaultlang)) $urlfortermofuse = 'https://www.' . $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME . '/es-terminos-y-condiciones.php';
 			if ($urlfortermofuse)
 			{
 			?>
