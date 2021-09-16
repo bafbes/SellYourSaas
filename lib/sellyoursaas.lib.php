@@ -215,6 +215,7 @@ function sellyoursaasHasOpenInvoices($contract)
 /**
  * Return date of expiration
  * Take lowest planed end date for services (whatever is service status)
+ * $status is returned From the app line,$nbofusers from User line if exists and $nbofgbs from Gb line if exists
  *
  * @param 	Contrat $contract		Object contract
  * @return	array					Array of data array('expirationdate'=>Timestamp of expiration date, or 0 if error or not found)
