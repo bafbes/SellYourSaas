@@ -156,15 +156,15 @@ export CRONHEAD=${VIRTUALHOSTHEAD/php_value date.timezone /TZ=}
 # possibility to change the ssl certificates name
 export webSSLCertificateCRT=`grep 'websslcertificatecrt=' /etc/sellyoursaas.conf | cut -d '=' -f 2`
 if [[ "x$webSSLCertificateCRT" == "x" ]]; then
-	export webSSLCertificateCRT=with.sellyoursaas.com.crt
+	export webSSLCertificateCRT=/etc/apache2/with.sellyoursaas.com.crt
 fi
 export webSSLCertificateKEY=`grep 'websslcertificatekey=' /etc/sellyoursaas.conf | cut -d '=' -f 2`
 if [[ "x$webSSLCertificateKEY" == "x" ]]; then
-	export webSSLCertificateKEY=with.sellyoursaas.com.key
+	export webSSLCertificateKEY=/etc/apache2/with.sellyoursaas.com.key
 fi
 export webSSLCertificateIntermediate=`grep 'websslcertificateintermediate=' /etc/sellyoursaas.conf | cut -d '=' -f 2`
 if [[ "x$webSSLCertificateIntermediate" == "x" ]]; then
-	export webSSLCertificateIntermediate=with.sellyoursaas.com-intermediate.crt
+	export webSSLCertificateIntermediate=/etc/apache2/with.sellyoursaas.com-intermediate.crt
 fi
 
 export usecompressformatforarchive=`grep 'usecompressformatforarchive=' /etc/sellyoursaas.conf | cut -d '=' -f 2`
