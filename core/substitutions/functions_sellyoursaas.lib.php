@@ -113,7 +113,8 @@ function sellyoursaas_completesubstitutionarray(&$substitutionarray, $langs, $ob
 	// Force some values to another services
 	// $tmpobject is now a thirdparty
 	dol_syslog("sellyoursaas_completesubstitutionarray() tmpobject->array_options['options_domain_registration_page'] = ".(isset($tmpobject->array_options['options_domain_registration_page']) ? $tmpobject->array_options['options_domain_registration_page'] : '')." conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME = ".(empty($conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME) ? '' : $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME));
-	if (is_object($tmpobject) && ! empty($tmpobject->array_options['options_domain_registration_page'])) {
+	//Si la constante SELLYOURSAAS_USE_THIRDPARTY_DOMAIN_REGISTRATION_PAGE, on n'enverra des mails qu'avec l'adresse mail d'envoi utilisée lors de l'enregistrement
+	if (! empty($conf->global->SELLYOURSAAS_USE_THIRDPARTY_DOMAIN_REGISTRATION_PAGE) &&is_object($tmpobject) && ! empty($tmpobject->array_options['options_domain_registration_page'])) {
 		global $savconf;
 
 		dol_syslog("savconf isset = ".isset($savconf));
