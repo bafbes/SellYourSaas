@@ -903,9 +903,9 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 	echo "cat $vhostfile | sed -e 's/__webAppDomain__/$instancename.$domainname/g' | \
 			  sed -e 's/__webAppAliases__/$instancename.$domainname/g' | \
 			  sed -e 's/__webAppLogName__/$instancename/g' | \
-              sed -e 's/__webSSLCertificateCRT__/$webSSLCertificateCRT/g' | \
-              sed -e 's/__webSSLCertificateKEY__/$webSSLCertificateKEY/g' | \
-              sed -e 's/__webSSLCertificateIntermediate__/$webSSLCertificateIntermediate/g' | \
+              sed -e 's#__webSSLCertificateCRT__#$webSSLCertificateCRT#g' | \
+              sed -e 's#__webSSLCertificateKEY__#$webSSLCertificateKEY#g' | \
+              sed -e 's#__webSSLCertificateIntermediate__#$webSSLCertificateIntermediate#g' | \
 			  sed -e 's/__webAdminEmail__/$EMAILFROM/g' | \
 			  sed -e 's/__osUsername__/$osusername/g' | \
 			  sed -e 's/__osGroupname__/$osusername/g' | \
@@ -919,9 +919,9 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 	cat $vhostfile | sed -e "s/__webAppDomain__/$instancename.$domainname/g" | \
 			  sed -e "s/__webAppAliases__/$instancename.$domainname/g" | \
 			  sed -e "s/__webAppLogName__/$instancename/g" | \
-              sed -e "s/__webSSLCertificateCRT__/$webSSLCertificateCRT/g" | \
-              sed -e "s/__webSSLCertificateKEY__/$webSSLCertificateKEY/g" | \
-              sed -e "s/__webSSLCertificateIntermediate__/$webSSLCertificateIntermediate/g" | \
+              sed -e "s#__webSSLCertificateCRT__#$webSSLCertificateCRT#g" | \
+              sed -e "s#__webSSLCertificateKEY__#$webSSLCertificateKEY#g" | \
+              sed -e "s#__webSSLCertificateIntermediate__#$webSSLCertificateIntermediate#g" | \
 			  sed -e "s/__webAdminEmail__/$EMAILFROM/g" | \
 			  sed -e "s/__osUsername__/$osusername/g" | \
 			  sed -e "s/__osGroupname__/$osusername/g" | \
@@ -959,7 +959,7 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 			export webCustomSSLCertificateCRT=$CERTIFFORCUSTOMDOMAIN.crt
 			export webCustomSSLCertificateKEY=$CERTIFFORCUSTOMDOMAIN.key
 			export webCustomSSLCertificateIntermediate=$CERTIFFORCUSTOMDOMAIN-intermediate.crt
-		
+
 			if [[ ! -e /etc/apache2/$webCustomSSLCertificateCRT ]]; then
 				echo "Create link /etc/apache2/$webCustomSSLCertificateCRT to $pathforcertif/crt/$webCustomSSLCertificateCRT"
 				ln -fs $pathforcertif/crt/$webCustomSSLCertificateCRT /etc/apache2/$webCustomSSLCertificateCRT
@@ -992,9 +992,9 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 		echo "cat $vhostfile | sed -e 's/__webAppDomain__/$customurl/g' | \
 				  sed -e 's/__webAppAliases__/$customurl/g' | \
 				  sed -e 's/__webAppLogName__/$instancename/g' | \
-                  sed -e 's/__webSSLCertificateCRT__/$webCustomSSLCertificateCRT/g' | \
-                  sed -e 's/__webSSLCertificateKEY__/$webCustomSSLCertificateKEY/g' | \
-                  sed -e 's/__webSSLCertificateIntermediate__/$webCustomSSLCertificateIntermediate/g' | \
+                  sed -e 's#__webSSLCertificateCRT__#$webCustomSSLCertificateCRT#g' | \
+                  sed -e 's#__webSSLCertificateKEY__#$webCustomSSLCertificateKEY#g' | \
+                  sed -e 's#__webSSLCertificateIntermediate__#$webCustomSSLCertificateIntermediate#g' | \
 				  sed -e 's/__webAdminEmail__/$EMAILFROM/g' | \
 				  sed -e 's/__osUsername__/$osusername/g' | \
 				  sed -e 's/__osGroupname__/$osusername/g' | \
@@ -1009,9 +1009,9 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 		cat $vhostfile | sed -e "s/__webAppDomain__/$customurl/g" | \
 				  sed -e "s/__webAppAliases__/$customurl/g" | \
 				  sed -e "s/__webAppLogName__/$instancename/g" | \
-                  sed -e "s/__webSSLCertificateCRT__/$webCustomSSLCertificateCRT/g" | \
-                  sed -e "s/__webSSLCertificateKEY__/$webCustomSSLCertificateKEY/g" | \
-                  sed -e "s/__webSSLCertificateIntermediate__/$webCustomSSLCertificateIntermediate/g" | \
+                  sed -e "s#__webSSLCertificateCRT__#$webCustomSSLCertificateCRT#g" | \
+                  sed -e "s#__webSSLCertificateKEY__#$webCustomSSLCertificateKEY#g" | \
+                  sed -e "s#__webSSLCertificateIntermediate__#$webCustomSSLCertificateIntermediate#g" | \
 				  sed -e "s/__webAdminEmail__/$EMAILFROM/g" | \
 				  sed -e "s/__osUsername__/$osusername/g" | \
 				  sed -e "s/__osGroupname__/$osusername/g" | \
