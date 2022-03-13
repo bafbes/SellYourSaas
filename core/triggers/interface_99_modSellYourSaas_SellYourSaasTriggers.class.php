@@ -221,7 +221,7 @@ class InterfaceSellYourSaasTriggers extends DolibarrTriggers
 
 	       			if ($testok)
 	       			{
-		       			if ($object->oldcopy->array_options['options_deployment_status'] != 'undeployed')
+		       			if (0&&$object->oldcopy->array_options['options_deployment_status'] != 'undeployed')
 		       			{
 		       				dol_syslog("We found a change in ref_customer or into custom url for a not undeployed instance, so we will call the remote action rename");
 		       				$remoteaction='rename';
