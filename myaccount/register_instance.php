@@ -110,7 +110,7 @@ if (empty($user->id)) {
     $user->getrights();
 }
 
-$codevalid = GETPOST('codevalid');
+$codevalid = str_replace(' ','+',GETPOST('codevalid'));
 $reusesocid = GETPOST('reusesocid', 'int');
 $plan = GETPOST('plan', 'alpha');
 $productref = (GETPOST('productref', 'alpha') ? GETPOST('productref', 'alpha') : ($plan ? $plan : ''));
