@@ -3615,7 +3615,7 @@ class SellYourSaasUtils
 
 			    			$sqltoexecute = make_substitutions($tmppackage->sqlafter, $substitarrayforsql);
 
-			    			$arrayofsql=explode(';', $sqltoexecute);
+			    			$arrayofsql=explode(";\r\n", $sqltoexecute);
 			    			foreach($arrayofsql as $sqltoexecuteline)
 			    			{
 			    				$sqltoexecuteline = trim($sqltoexecuteline);
