@@ -900,15 +900,15 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 		rm -f $apacheconf
 	fi
 
-	echo "cat $vhostfile | sed -e 's/__webAppDomain__/$instancename.$domainname/g' | \
-			  sed -e 's/__webAppAliases__/$instancename.$domainname/g' | \
-			  sed -e 's/__webAppLogName__/$instancename/g' | \
+	echo "cat $vhostfile | sed -e 's#__webAppDomain__#$instancename.$domainname#g' | \
+			  sed -e 's#__webAppAliases__#$instancename.$domainname#g' | \
+			  sed -e 's#__webAppLogName__#$instancename#g' | \
               sed -e 's#__webSSLCertificateCRT__#$webSSLCertificateCRT#g' | \
               sed -e 's#__webSSLCertificateKEY__#$webSSLCertificateKEY#g' | \
               sed -e 's#__webSSLCertificateIntermediate__#$webSSLCertificateIntermediate#g' | \
-			  sed -e 's/__webAdminEmail__/$EMAILFROM/g' | \
-			  sed -e 's/__osUsername__/$osusername/g' | \
-			  sed -e 's/__osGroupname__/$osusername/g' | \
+			  sed -e 's#__webAdminEmail__#$EMAILFROM#g' | \
+			  sed -e 's#__osUsername__#$osusername#g' | \
+			  sed -e 's#__osGroupname__#$osusername#g' | \
 			  sed -e 's;__osUserPath__;$targetdir/$osusername/$dbname;g' | \
 			  sed -e 's;__VirtualHostHead__;$VIRTUALHOSTHEAD;g' | \
 			  sed -e 's;__AllowOverride__;$ALLOWOVERRIDE;g' | \
@@ -916,15 +916,15 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 			  sed -e 's;#ErrorLog;$ErrorLog;g' | \
 			  sed -e 's;__webMyAccount__;$SELLYOURSAAS_ACCOUNT_URL;g' | \
 			  sed -e 's;__webAppPath__;$instancedir;g' > $apacheconf"
-	cat $vhostfile | sed -e "s/__webAppDomain__/$instancename.$domainname/g" | \
-			  sed -e "s/__webAppAliases__/$instancename.$domainname/g" | \
-			  sed -e "s/__webAppLogName__/$instancename/g" | \
+	cat $vhostfile | sed -e "s#__webAppDomain__#$instancename.$domainname#g" | \
+			  sed -e "s#__webAppAliases__#$instancename.$domainname#g" | \
+			  sed -e "s#__webAppLogName__#$instancename#g" | \
               sed -e "s#__webSSLCertificateCRT__#$webSSLCertificateCRT#g" | \
               sed -e "s#__webSSLCertificateKEY__#$webSSLCertificateKEY#g" | \
               sed -e "s#__webSSLCertificateIntermediate__#$webSSLCertificateIntermediate#g" | \
-			  sed -e "s/__webAdminEmail__/$EMAILFROM/g" | \
-			  sed -e "s/__osUsername__/$osusername/g" | \
-			  sed -e "s/__osGroupname__/$osusername/g" | \
+			  sed -e "s#__webAdminEmail__#$EMAILFROM#g" | \
+			  sed -e "s#__osUsername__#$osusername#g" | \
+			  sed -e "s#__osGroupname__#$osusername#g" | \
 			  sed -e "s;__osUserPath__;$targetdir/$osusername/$dbname;g" | \
 			  sed -e "s;__VirtualHostHead__;$VIRTUALHOSTHEAD;g" | \
 			  sed -e "s;__AllowOverride__;$ALLOWOVERRIDE;g" | \
@@ -989,15 +989,15 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 			fi
 		fi
 
-		echo "cat $vhostfile | sed -e 's/__webAppDomain__/$customurl/g' | \
-				  sed -e 's/__webAppAliases__/$customurl/g' | \
-				  sed -e 's/__webAppLogName__/$instancename/g' | \
+		echo "cat $vhostfile | sed -e 's#__webAppDomain__#$customurl#g' | \
+				  sed -e 's#__webAppAliases__#$customurl#g' | \
+				  sed -e 's#__webAppLogName__#$instancename#g' | \
                   sed -e 's#__webSSLCertificateCRT__#$webCustomSSLCertificateCRT#g' | \
                   sed -e 's#__webSSLCertificateKEY__#$webCustomSSLCertificateKEY#g' | \
                   sed -e 's#__webSSLCertificateIntermediate__#$webCustomSSLCertificateIntermediate#g' | \
-				  sed -e 's/__webAdminEmail__/$EMAILFROM/g' | \
-				  sed -e 's/__osUsername__/$osusername/g' | \
-				  sed -e 's/__osGroupname__/$osusername/g' | \
+				  sed -e 's#__webAdminEmail__#$EMAILFROM#g' | \
+				  sed -e 's#__osUsername__#$osusername#g' | \
+				  sed -e 's#__osGroupname__#$osusername#g' | \
 				  sed -e 's;__osUserPath__;$targetdir/$osusername/$dbname;g' | \
 				  sed -e 's;__VirtualHostHead__;$VIRTUALHOSTHEAD;g' | \
 				  sed -e 's;__AllowOverride__;$ALLOWOVERRIDE;g' | \
@@ -1005,16 +1005,16 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 				  sed -e 's;#ErrorLog;$ErrorLog;g' | \
 				  sed -e 's;__webMyAccount__;$SELLYOURSAAS_ACCOUNT_URL;g' | \
 				  sed -e 's;__webAppPath__;$instancedir;g' | \
-				  sed -e 's/with\.sellyoursaas\.com/$CERTIFFORCUSTOMDOMAIN/g' > $apacheconf"
-		cat $vhostfile | sed -e "s/__webAppDomain__/$customurl/g" | \
-				  sed -e "s/__webAppAliases__/$customurl/g" | \
-				  sed -e "s/__webAppLogName__/$instancename/g" | \
+				  sed -e 's#with\.sellyoursaas\.com#$CERTIFFORCUSTOMDOMAIN#g' > $apacheconf"
+		cat $vhostfile | sed -e "s#__webAppDomain__#$customurl#g" | \
+				  sed -e "s#__webAppAliases__#$customurl#g" | \
+				  sed -e "s#__webAppLogName__#$instancename#g" | \
                   sed -e "s#__webSSLCertificateCRT__#$webCustomSSLCertificateCRT#g" | \
                   sed -e "s#__webSSLCertificateKEY__#$webCustomSSLCertificateKEY#g" | \
                   sed -e "s#__webSSLCertificateIntermediate__#$webCustomSSLCertificateIntermediate#g" | \
-				  sed -e "s/__webAdminEmail__/$EMAILFROM/g" | \
-				  sed -e "s/__osUsername__/$osusername/g" | \
-				  sed -e "s/__osGroupname__/$osusername/g" | \
+				  sed -e "s#__webAdminEmail__#$EMAILFROM#g" | \
+				  sed -e "s#__osUsername__#$osusername#g" | \
+				  sed -e "s#__osGroupname__#$osusername#g" | \
 				  sed -e "s;__osUserPath__;$targetdir/$osusername/$dbname;g" | \
 				  sed -e "s;__VirtualHostHead__;$VIRTUALHOSTHEAD;g" | \
 				  sed -e "s;__AllowOverride__;$ALLOWOVERRIDE;g" | \
@@ -1022,7 +1022,7 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 				  sed -e "s;#ErrorLog;$ErrorLog;g" | \
 				  sed -e "s;__webMyAccount__;$SELLYOURSAAS_ACCOUNT_URL;g" | \
 				  sed -e "s;__webAppPath__;$instancedir;g" | \
-				  sed -e "s/with\.sellyoursaas\.com/$CERTIFFORCUSTOMDOMAIN/g" > $apacheconf
+				  sed -e "s#with\.sellyoursaas\.com#$CERTIFFORCUSTOMDOMAIN#g" > $apacheconf
 
 
 		echo Enable conf with ln -fs /etc/apache2/sellyoursaas-available/$fqn.custom.conf /etc/apache2/sellyoursaas-online 
