@@ -1155,7 +1155,7 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 
 	echo `date +%Y%m%d%H%M%S`" ***** Create database $dbname for user $dbusername"
 	
-	Q1="CREATE DATABASE IF NOT EXISTS $dbname CHARACTER SET utf8 COLLATE utf8_general_ci;; "
+	Q1="CREATE DATABASE IF NOT EXISTS $dbname CHARACTER SET utf8 COLLATE utf8_unicode_ci;; "
 	#Q2="CREATE USER IF NOT EXISTS '$dbusername'@'localhost' IDENTIFIED BY '$dbpassword'; "
 	Q2="CREATE USER '$dbusername'@'localhost' IDENTIFIED BY '$dbpassword'; "
 	SQL="${Q1}${Q2}"
