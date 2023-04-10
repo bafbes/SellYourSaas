@@ -159,11 +159,20 @@ function top_htmlhead_sellyoursaas($head, $title='', $disablejs=0, $disablehead=
 		$favicon=getDomainFromURL($_SERVER['SERVER_NAME'], 0);
 		if (! preg_match('/\.(png|jpg)$/', $favicon)) $favicon.='.png';
 		if (! empty($conf->global->MAIN_FAVICON_URL)) $favicon=$conf->global->MAIN_FAVICON_URL;
-		if ($favicon) {
+/*		if ($favicon) {
 		    $href = 'img/'.$favicon;
 		    if (preg_match('/^http/i', $favicon)) $href = $favicon;
 		    print '<link rel="shortcut icon" href="'.$href.'">'."\n";
-		}
+		}*/
+		?>
+		<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+		<link rel="manifest" href="favicon/site.webmanifest">
+		<link rel="mask-icon" href=favicon"/safari-pinned-tab.svg" color="#5bbad5">
+		<meta name="msapplication-TileColor" content="#da532c">
+		<meta name="theme-color" content="#ffffff">
+		<?php
 
 		// Displays title
 		$appli=constant('DOL_APPLICATION_TITLE');
