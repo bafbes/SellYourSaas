@@ -28,146 +28,155 @@
 //if (! defined('NOREQUIREMENU'))  define('NOREQUIREMENU','1');			// If there is no need to load and show top and left menu
 //if (! defined('NOREQUIREHTML'))  define('NOREQUIREHTML','1');			// If we don't need to load the html.form.class.php
 //if (! defined('NOREQUIREAJAX'))  define('NOREQUIREAJAX','1');
-if (! defined("NOLOGIN"))        define("NOLOGIN",'1');				    // If this page is public (can be called outside logged session)
-if (! defined('NOIPCHECK'))      define('NOIPCHECK','1');				// Do not check IP defined into conf $dolibarr_main_restrict_ip
-if (! defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
+if (!defined("NOLOGIN")) define("NOLOGIN", '1');                    // If this page is public (can be called outside logged session)
+if (!defined('NOIPCHECK')) define('NOIPCHECK', '1');                // Do not check IP defined into conf $dolibarr_main_restrict_ip
+if (!defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
 
 $sapi_type = php_sapi_name();
 $script_file = basename(__FILE__);
-$path=dirname($_SERVER['PHP_SELF']).'/';
+$path = dirname($_SERVER['PHP_SELF']) . '/';
 
 // Test if batch mode
 if (substr($sapi_type, 0, 3) != 'cli') {
 	// Add specific definition to allow a dedicated session management
-	include ('./mainmyaccount.inc.php');
-} else {
+	include('./mainmyaccount.inc.php');
+}
+else {
 	// Add specific definition to allow a dedicated session management
-	include ($path.'mainmyaccount.inc.php');
+	include($path . 'mainmyaccount.inc.php');
 }
 
 // Load Dolibarr environment
-$res=0;
+$res = 0;
 if (substr($sapi_type, 0, 3) != 'cli') {
 	// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-	if (! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res=@include($_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php");
+	if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include($_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php");
 	// Try main.inc.php into web root detected using web root caluclated from SCRIPT_FILENAME
-	$tmp=empty($_SERVER['SCRIPT_FILENAME'])?'':$_SERVER['SCRIPT_FILENAME'];$tmp2=realpath(__FILE__); $i=strlen($tmp)-1; $j=strlen($tmp2)-1;
-	while($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i]==$tmp2[$j]) { $i--; $j--; }
-	if (! $res && $i > 0 && file_exists(substr($tmp, 0, ($i+1))."/main.inc.php")) $res=@include(substr($tmp, 0, ($i+1))."/main.inc.php");
-	if (! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i+1)))."/main.inc.php")) $res=include(dirname(substr($tmp, 0, ($i+1)))."/main.inc.php");
+	$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME'];
+	$tmp2 = realpath(__FILE__);
+	$i = strlen($tmp) - 1;
+	$j = strlen($tmp2) - 1;
+	while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) {
+		$i--;
+		$j--;
+	}
+	if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res = @include(substr($tmp, 0, ($i + 1)) . "/main.inc.php");
+	if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = include(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php");
 	// Try main.inc.php using relative path
-	if (! $res && file_exists("../../main.inc.php")) $res=@include("../../main.inc.php");
-	if (! $res && file_exists("../../../main.inc.php")) $res=@include("../../../main.inc.php");
-} else {
+	if (!$res && file_exists("../../main.inc.php")) $res = @include("../../main.inc.php");
+	if (!$res && file_exists("../../../main.inc.php")) $res = @include("../../../main.inc.php");
+}
+else {
 	// Try master.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-	$tmp=empty($_SERVER['SCRIPT_FILENAME'])?'':$_SERVER['SCRIPT_FILENAME'];$tmp2=realpath(__FILE__); $i=strlen($tmp)-1; $j=strlen($tmp2)-1;
-	while($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i]==$tmp2[$j]) { $i--; $j--; }
-	if (! $res && $i > 0 && file_exists(substr($tmp, 0, ($i+1))."/master.inc.php")) $res=@include substr($tmp, 0, ($i+1))."/master.inc.php";
-	if (! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i+1)))."/master.inc.php")) $res=@include dirname(substr($tmp, 0, ($i+1)))."/master.inc.php";
+	$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME'];
+	$tmp2 = realpath(__FILE__);
+	$i = strlen($tmp) - 1;
+	$j = strlen($tmp2) - 1;
+	while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) {
+		$i--;
+		$j--;
+	}
+	if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/master.inc.php")) $res = @include substr($tmp, 0, ($i + 1)) . "/master.inc.php";
+	if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/master.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/master.inc.php";
 	// Try master.inc.php using relative path
-	if (! $res && file_exists("./master.inc.php")) $res=@include "./master.inc.php";
-	if (! $res && file_exists("../master.inc.php")) $res=@include "../master.inc.php";
-	if (! $res && file_exists("../../master.inc.php")) $res=@include "../../master.inc.php";
-	if (! $res && file_exists("../../../master.inc.php")) $res=@include "../../../master.inc.php";
-	if (! $res) die("Include of master fails");
+	if (!$res && file_exists("./master.inc.php")) $res = @include "./master.inc.php";
+	if (!$res && file_exists("../master.inc.php")) $res = @include "../master.inc.php";
+	if (!$res && file_exists("../../master.inc.php")) $res = @include "../../master.inc.php";
+	if (!$res && file_exists("../../../master.inc.php")) $res = @include "../../../master.inc.php";
+	if (!$res) die("Include of master fails");
 	// After this $db, $mysoc, $langs, $conf and $hookmanager are defined (Opened $db handler to database will be closed at end of file).
 	// $user is created but empty.
 }
-if (! $res) die("Include of main fails");
+if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/geturl.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
-require_once DOL_DOCUMENT_ROOT.'/cron/class/cronjob.class.php';
-require_once DOL_DOCUMENT_ROOT.'/contrat/class/contrat.class.php';
-require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/geturl.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+require_once DOL_DOCUMENT_ROOT . '/cron/class/cronjob.class.php';
+require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 dol_include_once('/sellyoursaas/lib/sellyoursaas.lib.php');
 dol_include_once('/sellyoursaas/class/packages.class.php');
 
 // Re set variables specific to new environment
-$conf->global->SYSLOG_FILE_ONEPERSESSION=1;
-$langs=new Translate('', $conf);
-$langs->setDefaultLang(GETPOST('lang','aZ09')?GETPOST('lang','aZ09'):'auto');
+$conf->global->SYSLOG_FILE_ONEPERSESSION = 1;
+$langs = new Translate('', $conf);
+$langs->setDefaultLang(GETPOST('lang', 'aZ09') ? GETPOST('lang', 'aZ09') : 'auto');
 
-$langsen=new Translate('', $conf);
+$langsen = new Translate('', $conf);
 $langsen->setDefaultLang('en_US');
 
-$langs->loadLangs(array("main","companies","sellyoursaas@sellyoursaas","errors"));
-$langsen->loadLangs(array("main","companies","sellyoursaas@sellyoursaas","errors"));
+$langs->loadLangs(array("main", "companies", "sellyoursaas@sellyoursaas", "errors"));
+$langsen->loadLangs(array("main", "companies", "sellyoursaas@sellyoursaas", "errors"));
 
 // Force user
 if (empty($user->id)) {
-    $user->fetch($conf->global->SELLYOURSAAS_ANONYMOUSUSER);
-    // Set $user to the anonymous user
-    if (empty($user->id)) {
-        dol_print_error_email('SETUPANON', 'Error setup of module not complete or wrong. Missing the anonymous user.', null, 'alert alert-error');
-        exit(-1);
-    }
+	$user->fetch($conf->global->SELLYOURSAAS_ANONYMOUSUSER);
+	// Set $user to the anonymous user
+	if (empty($user->id)) {
+		dol_print_error_email('SETUPANON', 'Error setup of module not complete or wrong. Missing the anonymous user.', null, 'alert alert-error');
+		exit(-1);
+	}
 
-    $user->getrights();
+	$user->getrights();
 }
 
-$codevalid = str_replace(' ','+',GETPOST('codevalid'));
+$codevalid = str_replace(' ', '+', GETPOST('codevalid'));
 $reusesocid = GETPOST('reusesocid', 'int');
 $plan = GETPOST('plan', 'alpha');
 $productref = (GETPOST('productref', 'alpha') ? GETPOST('productref', 'alpha') : ($plan ? $plan : ''));
+$action = GETPOST('action', 'alpha');
+$orgname = ucfirst(trim(GETPOST('orgName', 'alpha')));
+$email = trim(GETPOST('username', 'alpha'));
+$phone = trim(GETPOST('phone', 'alpha'));
+$domainemail = preg_replace('/^.*@/', '', $email);
+$password = trim(GETPOST('password', 'alpha'));
+$password2 = trim(GETPOST('password2', 'alpha'));
+$country_code = trim(GETPOST('address_country', 'alpha'));
+$sldAndSubdomain = trim(GETPOST('sldAndSubdomain', 'alpha'));
+$tldid = trim(GETPOST('tldid', 'alpha'));
+$optinmessages = (GETPOST('optinmessages', 'aZ09') == '1' ? 1 : 0);
+
+$origin = GETPOST('origin', 'aZ09');
+$partner = GETPOST('partner', 'int');
+$partnerkey = GETPOST('partnerkey', 'alpha');        // md5 of partner name_alias
+$custmourl = '';
+
+$fromsocid = GETPOST('fromsocid', 'int');
+$reusecontractid = GETPOST('reusecontractid', 'int');
+$disablecustomeremail = GETPOST('disablecustomeremail', 'alpha');
+
+$service = GETPOST('service', 'int');
+$productid = GETPOST('service', 'int');
+$extcss = GETPOST('extcss', 'alpha');
 if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && !empty($codevalid)) {
 
-    //appel depuis url de création d'instance avec les paramètres reusesocid,codevalid et productref en get
-    $tmpsoc = new Societe($db);
-    $tmpsoc->fetch($reusesocid);
-    if(!empty($tmpsoc->array_options['options_valide'])){
-        print $langs->trans("ErrorCustomerAlreadyValidated");
-        exit(-1);
-    }
-    if($tmpsoc->array_options['options_code_validation']!=$codevalid){
-        print $langs->trans("ErrorOnCodeValidation");
-        exit(-1);
-    }
-    $tmpsoc->array_options['options_valide']=1;
-    $tmpsoc->insertExtraFields();//validation du client
+	//appel depuis url de création d'instance avec les paramètres reusesocid,codevalid et productref en get
+	$tmpsoc = new Societe($db);
+	$tmpsoc->fetch($reusesocid);
+	if (!empty($tmpsoc->array_options['options_valide'])) {
+		print $langs->trans("ErrorCustomerAlreadyValidated");
+		exit(-1);
+	}
+	if ($tmpsoc->array_options['options_code_validation'] != $codevalid) {
+		print $langs->trans("ErrorOnCodeValidation");
+		exit(-1);
+	}
+	$tmpsoc->array_options['options_valide'] = 1;
+	$tmpsoc->insertExtraFields();//validation du client
 
-    $orgname = $tmpsoc->name;
-    $email = $tmpsoc->email;
-    $phone = $tmpsoc->phone;
-    $domainemail = preg_replace('/^.*@/', '', $email);
-    $password = $password2 = $tmpsoc->array_options['options_oldpassword'];
-    $country_code = $tmpsoc->country_code;;
-    $sldAndSubdomain = trim(ucfirst(strtolower(str_replace(' ', '', $orgname))));
-    $tldid = '.'.$conf->global->SELLYOURSAAS_SUB_DOMAIN_NAMES;//A changer si plusieurs domaines de déploiement
-    $optinmessages = $tmpsoc->array_options['options_optinmessages'];
-}
-
-else {
-
-    $action = GETPOST('action','alpha');
-    $orgname = ucfirst(trim(GETPOST('orgName','alpha')));
-    $email = trim(GETPOST('username','alpha'));
-    $phone = trim(GETPOST('phone','alpha'));
-    $domainemail = preg_replace('/^.*@/', '', $email);
-    $password = trim(GETPOST('password','alpha'));
-    $password2 = trim(GETPOST('password2','alpha'));
-    $country_code = trim(GETPOST('address_country','alpha'));
-    $sldAndSubdomain = trim(GETPOST('sldAndSubdomain','alpha'));
-    $tldid = trim(GETPOST('tldid','alpha'));
-    $optinmessages = (GETPOST('optinmessages','aZ09') == '1' ? 1 : 0);
-
-    $origin = GETPOST('origin','aZ09');
-    $partner=GETPOST('partner','int');
-    $partnerkey=GETPOST('partnerkey','alpha');		// md5 of partner name_alias
-    $custmourl = '';
-
-    $fromsocid=GETPOST('fromsocid','int');
-    $reusecontractid = GETPOST('reusecontractid','int');
-    $disablecustomeremail = GETPOST('disablecustomeremail','alpha');
-
-    $service=GETPOST('service','int');
-    $productid=GETPOST('service','int');
-    $extcss=GETPOST('extcss','alpha');
-
+	$orgname = $tmpsoc->name;
+	$email = $tmpsoc->email;
+	$phone = $tmpsoc->phone;
+	$domainemail = preg_replace('/^.*@/', '', $email);
+	$password = $password2 = $tmpsoc->array_options['options_oldpassword'];
+	$country_code = $tmpsoc->country_code;;
+	$sldAndSubdomain = trim(ucfirst(strtolower(str_replace(' ', '', $orgname))));
+	$tldid = '.' . $conf->global->SELLYOURSAAS_SUB_DOMAIN_NAMES;//A changer si plusieurs domaines de déploiement
+	$optinmessages = $tmpsoc->array_options['options_optinmessages'];
 }
 // If ran from command line
 if (substr($sapi_type, 0, 3) == 'cli') {
@@ -176,24 +185,24 @@ if (substr($sapi_type, 0, 3) == 'cli') {
 	$instancefullnamearray = explode('.', $instancefullname);
 	$sldAndSubdomain = $instancefullnamearray[0];
 	unset($instancefullnamearray[0]);
-	$tldid = '.'.join('.', $instancefullnamearray);
+	$tldid = '.' . join('.', $instancefullnamearray);
 	$password = $argv[3];
 	$reusesocid = $argv[4];
 	$custmourl = $argv[5];
 	if (empty($productref) || empty($sldAndSubdomain) || empty($tldid) || empty($password) || empty($reusesocid)) {
-		print "***** ".$script_file." *****\n";
+		print "***** " . $script_file . " *****\n";
 		print "Create an instance from command line. Run this script from the master server. Note: No email are sent to customer.\n";
-		print "Usage:   ".$script_file." SERVICETODEPLOY shortnameinstance.sellyoursaasdomain password CustomerID [custom_domain]\n";
-		print "Example: ".$script_file." SERVICETODEPLOY myinstance.with.mysellyoursaasdomain.com mypassword 123 [myinstance.withold.mysellyoursaasdomain.com]\n";
+		print "Usage:   " . $script_file . " SERVICETODEPLOY shortnameinstance.sellyoursaasdomain password CustomerID [custom_domain]\n";
+		print "Example: " . $script_file . " SERVICETODEPLOY myinstance.with.mysellyoursaasdomain.com mypassword 123 [myinstance.withold.mysellyoursaasdomain.com]\n";
 		exit(-1);
 	}
 	$CERTIFFORCUSTOMDOMAIN = $custmourl;
 	if ($CERTIFFORCUSTOMDOMAIN &&
-		(! file_exists($conf->sellyoursaas->dir_output.'/crt/'.$CERTIFFORCUSTOMDOMAIN.'.crt') || ! file_exists($conf->sellyoursaas->dir_output.'/crt/'.$CERTIFFORCUSTOMDOMAIN.'.key') || ! file_exists($conf->sellyoursaas->dir_output.'/crt/'.$CERTIFFORCUSTOMDOMAIN.'-intermediate.crt'))) {
-		print "***** ".$script_file." *****\n";
+		(!file_exists($conf->sellyoursaas->dir_output . '/crt/' . $CERTIFFORCUSTOMDOMAIN . '.crt') || !file_exists($conf->sellyoursaas->dir_output . '/crt/' . $CERTIFFORCUSTOMDOMAIN . '.key') || !file_exists($conf->sellyoursaas->dir_output . '/crt/' . $CERTIFFORCUSTOMDOMAIN . '-intermediate.crt'))) {
+		print "***** " . $script_file . " *****\n";
 		print "Create an instance from command line. Run this script from the master server. Note: No email are sent to customer.\n";
-		print "Usage:   ".$script_file." SERVICETODEPLOY shortnameinstance.sellyoursaasdomain password CustomerID [custom_domain]\n";
-		print 'Error:   A certificat file '.$conf->sellyoursaas->dir_output.'/crt/'.$CERTIFFORCUSTOMDOMAIN.'(.crt|.key|-intermediate.crt) not found.'."\n";
+		print "Usage:   " . $script_file . " SERVICETODEPLOY shortnameinstance.sellyoursaasdomain password CustomerID [custom_domain]\n";
+		print 'Error:   A certificat file ' . $conf->sellyoursaas->dir_output . '/crt/' . $CERTIFFORCUSTOMDOMAIN . '(.crt|.key|-intermediate.crt) not found.' . "\n";
 		exit(-1);
 	}
 	$password2 = $password;
@@ -214,31 +223,26 @@ $tmpproduct = new Product($db);
 $tmppackage = new Packages($db);
 
 // Load main product
-if (empty($reusecontractid) && $productref != 'none')
-{
+if (empty($reusecontractid) && $productref != 'none') {
 	$result = $tmpproduct->fetch($productid, $productref);
-	if (empty($tmpproduct->id))
-	{
-		print 'Service/Plan (Product id / ref) '.$productid.' / '.$productref.' was not found.'."\n";
+	if (empty($tmpproduct->id)) {
+		print 'Service/Plan (Product id / ref) ' . $productid . ' / ' . $productref . ' was not found.' . "\n";
 		exit(-1);
 	}
 	// We have the main product, we are searching the package
-	if (empty($tmpproduct->array_options['options_package']))
-	{
-		print 'Service/Plan (Product id / ref) '.$tmpproduct->id.' / '.$productref.' has no package defined on it.'."\n";
+	if (empty($tmpproduct->array_options['options_package'])) {
+		print 'Service/Plan (Product id / ref) ' . $tmpproduct->id . ' / ' . $productref . ' has no package defined on it.' . "\n";
 		exit(-1);
 	}
 	// We have the main product, we are searching the duration
-	if (empty($tmpproduct->duration_value) || empty($tmpproduct->duration_unit))
-	{
-		print 'Service/Plan name (Product ref) '.$productref.' has no default duration'."\n";
+	if (empty($tmpproduct->duration_value) || empty($tmpproduct->duration_unit)) {
+		print 'Service/Plan name (Product ref) ' . $productref . ' has no default duration' . "\n";
 		exit(-1);
 	}
 
 	$tmppackage->fetch($tmpproduct->array_options['options_package']);
-	if (empty($tmppackage->id))
-	{
-		print 'Package with id '.$tmpproduct->array_options['options_package'].' was not found.'."\n";
+	if (empty($tmppackage->id)) {
+		print 'Package with id ' . $tmpproduct->array_options['options_package'] . ' was not found.' . "\n";
 		exit(-1);
 	}
 }
@@ -255,271 +259,252 @@ $now = dol_now();
 //print "partner=".$partner." productref=".$productref." orgname = ".$orgname." email=".$email." password=".$password." password2=".$password2." country_code=".$country_code." remoteip=".$remoteip." sldAndSubdomain=".$sldAndSubdomain." tldid=".$tldid;
 
 // Back to url
-$newurl=preg_replace('/register_instance\.php/', 'register.php', $_SERVER["PHP_SELF"]);
+$newurl = preg_replace('/register_instance\.php/', 'register.php', $_SERVER["PHP_SELF"]);
 
-if ($reusecontractid)		// When we use the "Restart deploy" after error from account backoffice
+if ($reusecontractid)        // When we use the "Restart deploy" after error from account backoffice
 {
-	$newurl=preg_replace('/register_instance/', 'index', $newurl);
-	if (! preg_match('/\?/', $newurl)) $newurl.='?';
-	$newurl.='&mode=instances';
-	$newurl.='&reusecontractid='.$reusecontractid;
+	$newurl = preg_replace('/register_instance/', 'index', $newurl);
+	if (!preg_match('/\?/', $newurl)) $newurl .= '?';
+	$newurl .= '&mode=instances';
+	$newurl .= '&reusecontractid=' . $reusecontractid;
 }
-elseif ($reusesocid)		// When we use the "Add another instance" from myaccount dashboard
+elseif ($reusesocid)        // When we use the "Add another instance" from myaccount dashboard
 {
-	if (empty($productref) && ! empty($service))
-	{
+	if (empty($productref) && !empty($service)) {
 		$tmpproduct = new Product($db);
 		$tmpproduct->fetch($service);
 		$productref = $tmpproduct->ref;
 	}
 
-	$newurl=preg_replace('/register_instance/', 'index', $newurl);
-	if (! preg_match('/\?/', $newurl)) $newurl.='?';
-	$newurl.='&reusesocid='.$reusesocid;
-    $newurl.='&mode='.(GETPOST('mode','alpha') == 'mycustomerinstances' ? 'mycustomerinstances': 'instances');
-	if (! preg_match('/sldAndSubdomain/i', $sldAndSubdomain)) $newurl.='&sldAndSubdomain='.urlencode($sldAndSubdomain);
-	if (! preg_match('/tldid/i', $tldid)) $newurl.='&tldid='.urlencode($tldid);
-	if (! preg_match('/service/i', $newurl)) $newurl.='&service='.urlencode($service);
-	if (! preg_match('/partner/i', $newurl)) $newurl.='&partner='.urlencode($partner);
-	if (! preg_match('/partnerkey/i', $newurl)) $newurl.='&partnerkey='.urlencode($partnerkey);		// md5 of partner name alias
-	if (! preg_match('/origin/i', $newurl)) $newurl.='&origin='.urlencode($origin);
-	if (! preg_match('/disablecustomeremail/i', $newurl)) $newurl.='&disablecustomeremail='.urlencode($disablecustomeremail);
+	$newurl = preg_replace('/register_instance/', 'index', $newurl);
+	if (!preg_match('/\?/', $newurl)) $newurl .= '?';
+	$newurl .= '&reusesocid=' . $reusesocid;
+	$newurl .= '&mode=' . (GETPOST('mode', 'alpha') == 'mycustomerinstances' ? 'mycustomerinstances' : 'instances');
+	if (!preg_match('/sldAndSubdomain/i', $sldAndSubdomain)) $newurl .= '&sldAndSubdomain=' . urlencode($sldAndSubdomain);
+	if (!preg_match('/tldid/i', $tldid)) $newurl .= '&tldid=' . urlencode($tldid);
+	if (!preg_match('/service/i', $newurl)) $newurl .= '&service=' . urlencode($service);
+	if (!preg_match('/partner/i', $newurl)) $newurl .= '&partner=' . urlencode($partner);
+	if (!preg_match('/partnerkey/i', $newurl)) $newurl .= '&partnerkey=' . urlencode($partnerkey);        // md5 of partner name alias
+	if (!preg_match('/origin/i', $newurl)) $newurl .= '&origin=' . urlencode($origin);
+	if (!preg_match('/disablecustomeremail/i', $newurl)) $newurl .= '&disablecustomeremail=' . urlencode($disablecustomeremail);
 
 	if ($reusesocid < 0) // -1, the thirdparty was not selected
 	{
-	    // Return to dashboard, the only page where the customer is requested.
-	    $newurl=preg_replace('/register/', 'index', $newurl);
-	    setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Customer")), null, 'errors');
-	    header("Location: ".$newurl.'#addanotherinstance');
-	    exit(-1);
+		// Return to dashboard, the only page where the customer is requested.
+		$newurl = preg_replace('/register/', 'index', $newurl);
+		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Customer")), null, 'errors');
+		header("Location: " . $newurl . '#addanotherinstance');
+		exit(-1);
 	}
 
-	if ($productref != 'none' && empty($sldAndSubdomain))
-	{
+	if ($productref != 'none' && empty($sldAndSubdomain)) {
 		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("NameForYourApplication")), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
-	if ($productref != 'none' && strlen($sldAndSubdomain) >= 29)
-	{
+	if ($productref != 'none' && strlen($sldAndSubdomain) >= 29) {
 		setEventMessages($langs->trans("ErrorFieldTooLong", $langs->transnoentitiesnoconv("NameForYourApplication")), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
-	if ($productref != 'none' && ! preg_match('/^[a-zA-Z0-9\-]+$/', $sldAndSubdomain))		// Only a-z A-Z 0-9 and - . Note: - is removed by javascript part of register page.
+	if ($productref != 'none' && !preg_match('/^[a-zA-Z0-9\-]+$/', $sldAndSubdomain))        // Only a-z A-Z 0-9 and - . Note: - is removed by javascript part of register page.
 	{
 		setEventMessages($langs->trans("ErrorOnlyCharAZAllowedFor", $langs->transnoentitiesnoconv("NameForYourApplication")), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
-	if (empty($password) || empty($password2))
-	{
+	if (empty($password) || empty($password2)) {
 		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Password")), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
-	if ($password != $password2)
-	{
+	if ($password != $password2) {
 		setEventMessages($langs->trans("ErrorPasswordMismatch"), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
 }
-else                    // When we deploy from the register.php page
+else                    // When we deploy from the register.php page without SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION
 {
-    // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
-    $hookmanager->initHooks(array('sellyoursaas-register-instance'));
+	// Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
+	$hookmanager->initHooks(array('sellyoursaas-register-instance'));
 
-	if (! preg_match('/\?/', $newurl)) $newurl.='?';
-	if (! preg_match('/orgName/i', $newurl)) $newurl.='&orgName='.urlencode($orgname);
-	if (! preg_match('/username/i', $newurl)) $newurl.='&username='.urlencode($email);
-	if (! preg_match('/phone/i', $newurl)) $newurl.='&phone='.urlencode($phone);
-	if (! preg_match('/address_country/i', $newurl)) $newurl.='&address_country='.urlencode($country_code);
-	if (! preg_match('/sldAndSubdomain/i', $sldAndSubdomain)) $newurl.='&sldAndSubdomain='.urlencode($sldAndSubdomain);
-	if (! preg_match('/tldid/i', $tldid)) $newurl.='&tldid='.urlencode($tldid);
-	if (! preg_match('/plan/i', $newurl)) $newurl.='&plan='.urlencode($productref);
-	if (! preg_match('/partner/i', $newurl)) $newurl.='&partner='.urlencode($partner);
-	if (! preg_match('/partnerkey/i', $newurl)) $newurl.='&partnerkey='.urlencode($partnerkey);		// md5 of partner name alias
-	if (! preg_match('/origin/i', $newurl)) $newurl.='&origin='.urlencode($origin);
+	if (!preg_match('/\?/', $newurl)) $newurl .= '?';
+	if (!preg_match('/orgName/i', $newurl)) $newurl .= '&orgName=' . urlencode($orgname);
+	if (!preg_match('/username/i', $newurl)) $newurl .= '&username=' . urlencode($email);
+	if (!preg_match('/phone/i', $newurl)) $newurl .= '&phone=' . urlencode($phone);
+	if (!preg_match('/address_country/i', $newurl)) $newurl .= '&address_country=' . urlencode($country_code);
+	if (!preg_match('/sldAndSubdomain/i', $sldAndSubdomain)) $newurl .= '&sldAndSubdomain=' . urlencode($sldAndSubdomain);
+	if (!preg_match('/tldid/i', $tldid)) $newurl .= '&tldid=' . urlencode($tldid);
+	if (!preg_match('/plan/i', $newurl)) $newurl .= '&plan=' . urlencode($productref);
+	if (!preg_match('/partner/i', $newurl)) $newurl .= '&partner=' . urlencode($partner);
+	if (!preg_match('/partnerkey/i', $newurl)) $newurl .= '&partnerkey=' . urlencode($partnerkey);        // md5 of partner name alias
+	if (!preg_match('/origin/i', $newurl)) $newurl .= '&origin=' . urlencode($origin);
 
 	$parameters = array('tldid' => $tldid, 'username' => $email, 'sldAndSubdomain' => $sldAndSubdomain);
 	$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 	if ($reshook < 0) {
-	    setEventMessages($hookmanager->error, null, 'errors');
-	    header("Location: ".$newurl);
-	    exit(-1);
+		setEventMessages($hookmanager->error, null, 'errors');
+		header("Location: " . $newurl);
+		exit(-1);
 	}
 
-	if ($productref != 'none' && empty($sldAndSubdomain))
-	{
+	if ($productref != 'none' && empty($sldAndSubdomain)) {
 		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("NameForYourApplication")), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
-	if ($productref != 'none' && ! preg_match('/^[a-zA-Z0-9\-]+$/', $sldAndSubdomain))
-	{
+	if ($productref != 'none' && !preg_match('/^[a-zA-Z0-9\-]+$/', $sldAndSubdomain)) {
 		setEventMessages($langs->trans("ErrorOnlyCharAZAllowedFor", $langs->transnoentitiesnoconv("NameForYourApplication")), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
-	if (empty($orgname))
-	{
+	if (empty($orgname)) {
 		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("NameOfCompany")), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
-	if (! preg_match('/[a-zA-Z0-9][a-zA-Z0-9]/', $orgname))
-	{
+	if (!preg_match('/[a-zA-Z0-9][a-zA-Z0-9]/', $orgname)) {
 		setEventMessages($langs->trans("ErrorFieldMustHaveXChar", $langs->transnoentitiesnoconv("NameOfCompany"), 2), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
-	if (empty($email))
-	{
+	if (empty($email)) {
 		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Email")), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
-    if (! isValidEmail($email))
-    {
-        setEventMessages($langs->trans("ErrorBadEMail"), null, 'errors');
-        header("Location: ".$newurl);
-        exit(-1);
-    }
-    if (!empty($conf->global->SELLYOURSAAS_MANDATORY_PHONE)) {
-        if (empty($phone)) {
-            setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Phone")), null, 'errors');
-            header("Location: " . $newurl);
-            exit(-1);
-        }
-        if (!isValidPhone($phone)) {
-            setEventMessages($langs->trans("ErrorBadFormat"). ' : '.$langs->trans("Phone"), null, 'errors');
-            header("Location: " . $newurl);
-            exit(-1);
-        }
-    }
-	if (function_exists('isValidMXRecord') && isValidMXRecord($domainemail) == 0)
-	{
-	    dol_syslog("Try to register with a bad value for email domain : ".$domainemail);
-	    setEventMessages($langs->trans("BadValueForDomainInEmail", $domainemail, $conf->global->SELLYOURSAAS_MAIN_EMAIL), null, 'errors');
-		header("Location: ".$newurl);
+	if (!isValidEmail($email)) {
+		setEventMessages($langs->trans("ErrorBadEMail"), null, 'errors');
+		header("Location: " . $newurl);
 		exit(-1);
 	}
-	if (! empty($conf->global->SELLYOURSAAS_EMAIL_ADDRESSES_BANNED))
-	{
-	    $listofbanned = explode(",", $conf->global->SELLYOURSAAS_EMAIL_ADDRESSES_BANNED);
-	    if (! empty($listofbanned))
-	    {
-	        foreach($listofbanned as $banned)
-	        {
-	            if (preg_match('/'.preg_quote($banned, '/').'/i', $email))
-	            {
-	                setEventMessages($langs->trans("ErrorEMailAddressBannedForSecurityReasons"), null, 'errors');
-	                header("Location: ".$newurl);
-	                exit(-1);
-	            }
-	        }
-	    }
+	if (!empty($conf->global->SELLYOURSAAS_MANDATORY_PHONE)) {
+		if (empty($phone)) {
+			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Phone")), null, 'errors');
+			header("Location: " . $newurl);
+			exit(-1);
+		}
+		if (!isValidPhone($phone)) {
+			setEventMessages($langs->trans("ErrorBadFormat") . ' : ' . $langs->trans("Phone"), null, 'errors');
+			header("Location: " . $newurl);
+			exit(-1);
+		}
 	}
-	if (! empty($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_ENABLED) && ! empty($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_API_KEY))
-	{
-	    $allowed = false;
-	    $disposable = false;
-	    $allowedemail = (! empty($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_ALLOWED) ? json_decode($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_ALLOWED, true) : array());
-	    $bannedemail = (! empty($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_BANNED) ? json_decode($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_BANNED, true) : array());
-	    $parts = explode("@", $email);
-	    $domaintocheck = $parts[1];
-
-	    // Check cache of domain already check and allowed
-	    if (! empty($allowedemail)) {
-	        foreach ($allowedemail as $alloweddomainname) {
-	            if ($alloweddomainname == $domaintocheck) {
-	                $allowed = true;
-	                break;
-	            }
-	        }
-	    }
-
-	    // If not found in allowed database
-	    if ($allowed === false)
-	    {
-	        // Check cache of domain already check and banned
-	        if (! empty($bannedemail)) {
-	            foreach ($bannedemail as $banneddomainname) {
-	                if ($banneddomainname == $domaintocheck) {
-	                    $disposable = true;
-	                    break;
-	                }
-	            }
-	        }
-
-	        // Check in API Block Disposable E-mail database
-	        if ($disposable === false)
-	        {
-	            $emailtowarn = $conf->global->MAIN_INFO_SOCIETE_MAIL;
-	            $apikey = $conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_API_KEY;
-
-	            // Check if API account and credit are ok
-	            $request = "https://status.block-disposable-email.com/status/?apikey=".$apikey;
-	            $result = file_get_contents($request);
-	            $resultData = json_decode($result, true);
-
-	            if ($resultData["request_status"] == "ok" && $resultData["apikeystatus"] == "active" && $resultData["credits"] > "0")
-	            {
-	                $request = 'https://api.block-disposable-email.com/easyapi/json/'.$apikey.'/'.$domaintocheck;
-	                $result = file_get_contents($request);
-	                $resultData = json_decode($result, true);
-
-	                if ($resultData["request_status"] == "success")
-	                {
-	                    require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-
-	                    // domain is allowed
-	                    if ($resultData["domain_status"] == "ok") {
-	                        array_push($allowedemail, $domaintocheck);
-	                        dolibarr_set_const($db,'SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_ALLOWED',json_encode($allowedemail),'chaine',0,'',$conf->entity);
-	                    } else if ($resultData["domain_status"] == "block") {
-	                        array_push($bannedemail, $domaintocheck);
-	                        dolibarr_set_const($db,'SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_BANNED',json_encode($bannedemail),'chaine',0,'',$conf->entity);
-	                        setEventMessages($langs->trans("ErrorEMailAddressBannedForSecurityReasons"), null, 'errors');
-	                        header("Location: ".$newurl);
-	                        exit(-1);
-	                    } else {
-	                        setEventMessages($langs->trans("ErrorTechnicalErrorOccurredPleaseContactUsByEmail", $emailtowarn), null, 'errors');
-	                        header("Location: ".$newurl);
-	                        exit(-1);
-	                    }
-	                } else {
-	                    setEventMessages($langs->trans("ErrorTechnicalErrorOccurredPleaseContactUsByEmail", $emailtowarn), null, 'errors');
-	                    header("Location: ".$newurl);
-	                    exit(-1);
-	                }
-	            } else {
-	                setEventMessages($langs->trans("ErrorTechnicalErrorOccurredPleaseContactUsByEmail", $emailtowarn), null, 'errors');
-	                header("Location: ".$newurl);
-	                exit(-1);
-	            }
-	        } else {
-	            setEventMessages($langs->trans("ErrorEMailAddressBannedForSecurityReasons"), null, 'errors');
-	            header("Location: ".$newurl);
-	            exit(-1);
-	        }
-	    }
+	if (function_exists('isValidMXRecord') && isValidMXRecord($domainemail) == 0) {
+		dol_syslog("Try to register with a bad value for email domain : " . $domainemail);
+		setEventMessages($langs->trans("BadValueForDomainInEmail", $domainemail, $conf->global->SELLYOURSAAS_MAIN_EMAIL), null, 'errors');
+		header("Location: " . $newurl);
+		exit(-1);
 	}
-	if (empty($password) || empty($password2))
-	{
+	if (!empty($conf->global->SELLYOURSAAS_EMAIL_ADDRESSES_BANNED)) {
+		$listofbanned = explode(",", $conf->global->SELLYOURSAAS_EMAIL_ADDRESSES_BANNED);
+		if (!empty($listofbanned)) {
+			foreach ($listofbanned as $banned) {
+				if (preg_match('/' . preg_quote($banned, '/') . '/i', $email)) {
+					setEventMessages($langs->trans("ErrorEMailAddressBannedForSecurityReasons"), null, 'errors');
+					header("Location: " . $newurl);
+					exit(-1);
+				}
+			}
+		}
+	}
+	if (!empty($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_ENABLED) && !empty($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_API_KEY)) {
+		$allowed = false;
+		$disposable = false;
+		$allowedemail = (!empty($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_ALLOWED) ? json_decode($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_ALLOWED, true) : array());
+		$bannedemail = (!empty($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_BANNED) ? json_decode($conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_BANNED, true) : array());
+		$parts = explode("@", $email);
+		$domaintocheck = $parts[1];
+
+		// Check cache of domain already check and allowed
+		if (!empty($allowedemail)) {
+			foreach ($allowedemail as $alloweddomainname) {
+				if ($alloweddomainname == $domaintocheck) {
+					$allowed = true;
+					break;
+				}
+			}
+		}
+
+		// If not found in allowed database
+		if ($allowed === false) {
+			// Check cache of domain already check and banned
+			if (!empty($bannedemail)) {
+				foreach ($bannedemail as $banneddomainname) {
+					if ($banneddomainname == $domaintocheck) {
+						$disposable = true;
+						break;
+					}
+				}
+			}
+
+			// Check in API Block Disposable E-mail database
+			if ($disposable === false) {
+				$emailtowarn = $conf->global->MAIN_INFO_SOCIETE_MAIL;
+				$apikey = $conf->global->SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_API_KEY;
+
+				// Check if API account and credit are ok
+				$request = "https://status.block-disposable-email.com/status/?apikey=" . $apikey;
+				$result = file_get_contents($request);
+				$resultData = json_decode($result, true);
+
+				if ($resultData["request_status"] == "ok" && $resultData["apikeystatus"] == "active" && $resultData["credits"] > "0") {
+					$request = 'https://api.block-disposable-email.com/easyapi/json/' . $apikey . '/' . $domaintocheck;
+					$result = file_get_contents($request);
+					$resultData = json_decode($result, true);
+
+					if ($resultData["request_status"] == "success") {
+						require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+
+						// domain is allowed
+						if ($resultData["domain_status"] == "ok") {
+							array_push($allowedemail, $domaintocheck);
+							dolibarr_set_const($db, 'SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_ALLOWED', json_encode($allowedemail), 'chaine', 0, '', $conf->entity);
+						}
+						else if ($resultData["domain_status"] == "block") {
+							array_push($bannedemail, $domaintocheck);
+							dolibarr_set_const($db, 'SELLYOURSAAS_BLOCK_DISPOSABLE_EMAIL_BANNED', json_encode($bannedemail), 'chaine', 0, '', $conf->entity);
+							setEventMessages($langs->trans("ErrorEMailAddressBannedForSecurityReasons"), null, 'errors');
+							header("Location: " . $newurl);
+							exit(-1);
+						}
+						else {
+							setEventMessages($langs->trans("ErrorTechnicalErrorOccurredPleaseContactUsByEmail", $emailtowarn), null, 'errors');
+							header("Location: " . $newurl);
+							exit(-1);
+						}
+					}
+					else {
+						setEventMessages($langs->trans("ErrorTechnicalErrorOccurredPleaseContactUsByEmail", $emailtowarn), null, 'errors');
+						header("Location: " . $newurl);
+						exit(-1);
+					}
+				}
+				else {
+					setEventMessages($langs->trans("ErrorTechnicalErrorOccurredPleaseContactUsByEmail", $emailtowarn), null, 'errors');
+					header("Location: " . $newurl);
+					exit(-1);
+				}
+			}
+			else {
+				setEventMessages($langs->trans("ErrorEMailAddressBannedForSecurityReasons"), null, 'errors');
+				header("Location: " . $newurl);
+				exit(-1);
+			}
+		}
+	}
+	if (empty($password) || empty($password2)) {
 		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Password")), null, 'errors');
-	    header("Location: ".$newurl);
-	    exit(-1);
+		header("Location: " . $newurl);
+		exit(-1);
 	}
-	if ($password != $password2)
-	{
-	    setEventMessages($langs->trans("ErrorPasswordMismatch"), null, 'errors');
-	    header("Location: ".$newurl);
-	    exit(-1);
+	if ($password != $password2) {
+		setEventMessages($langs->trans("ErrorPasswordMismatch"), null, 'errors');
+		header("Location: " . $newurl);
+		exit(-1);
 	}
 }
-
 
 
 /*
@@ -533,49 +518,43 @@ $errormessages = array();
 
 $error = 0;
 
-dol_syslog("Start view of register_instance (reusecontractid = ".$reusecontractid.", reusesocid = ".$reusesocid.", fromsocid = ".$fromsocid.", sldAndSubdomain = ".$sldAndSubdomain.")");
+dol_syslog("Start view of register_instance (reusecontractid = " . $reusecontractid . ", reusesocid = " . $reusesocid . ", fromsocid = " . $fromsocid . ", sldAndSubdomain = " . $sldAndSubdomain . ")");
 
 
 if (empty($remoteip)) {
-	dol_syslog("InstanceCreationBlockedForSecurityPurpose empty remoteip", LOG_WARNING);	// Should not happen, ip should always be defined.
+	dol_syslog("InstanceCreationBlockedForSecurityPurpose empty remoteip", LOG_WARNING);    // Should not happen, ip should always be defined.
 	$emailtowarn = $conf->global->MAIN_INFO_SOCIETE_MAIL;
 	setEventMessages($langs->trans("InstanceCreationBlockedForSecurityPurpose", $emailtowarn, 'Unknown remote IP'), null, 'errors');
-	header("Location: ".$newurl);
+	header("Location: " . $newurl);
 	exit(-1);
 }
 
 // TODO Move other check on abuse here
 
 
-
-
-
 $contract = new Contrat($db);
-if ($reusecontractid)
-{
+if ($reusecontractid) {
 	// Get contract
 	$result = $contract->fetch($reusecontractid);
 	if ($result < 0) {
 		setEventMessages($langs->trans("NotFound"), null, 'errors');
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 		exit(-1);
 	}
 
 	// Get tmppackage
-	foreach($contract->lines as $keyline => $line)
-	{
+	foreach ($contract->lines as $keyline => $line) {
 		$tmpproduct = new Product($db);
-		if ($line->fk_product > 0)
-		{
+		if ($line->fk_product > 0) {
 			$tmpproduct->fetch($line->fk_product);
-			if ($tmpproduct->array_options['options_app_or_option'] == 'app')
-			{
+			if ($tmpproduct->array_options['options_app_or_option'] == 'app') {
 				if ($tmpproduct->array_options['options_package'] > 0) {
 					$tmppackage->fetch($tmpproduct->array_options['options_package']);
 					$freeperioddays = $tmpproduct->array_options['options_freeperioddays'];
 					break;
-				} else {
-					dol_syslog("Error: ID of package not defined on productwith ID ".$line->fk_product);
+				}
+				else {
+					dol_syslog("Error: ID of package not defined on productwith ID " . $line->fk_product);
 				}
 			}
 		}
@@ -588,98 +567,90 @@ if ($reusecontractid)
 	// Check thirdparty is same than the one in session
 	$thirdpartyidinsession = $_SESSION['dol_loginsellyoursaas'];
 	if ($thirdpartyidinsession != $tmpthirdparty->id) {
-		dol_syslog("Instance creation blocked for ".$remoteip." - Try to create instance for thirdparty id = ".$tmpthirdparty->id." when id in session is ".$thirdpartyidinsession);
+		dol_syslog("Instance creation blocked for " . $remoteip . " - Try to create instance for thirdparty id = " . $tmpthirdparty->id . " when id in session is " . $thirdpartyidinsession);
 		setEventMessages($langs->trans("ErrorInvalidReuseIDSurelyAHackAttempt"), null, 'errors');
 		header("Location: index.php");
 		exit(-1);
 	}
 
 	$email = $tmpthirdparty->email;
-	$password = substr(getRandomPassword(true, array('I')), 0, 9);		// Password is no more known (no more in memory) when we make a retry/restart of deploy
+	$password = substr(getRandomPassword(true, array('I')), 0, 9);        // Password is no more known (no more in memory) when we make a retry/restart of deploy
 
 	$generatedunixhostname = $contract->array_options['options_hostname_os'];
 	$generatedunixlogin = $contract->array_options['options_username_os'];
 	$generatedunixpassword = $contract->array_options['options_password_os'];
 	$generateddbhostname = $contract->array_options['options_hostname_db'];
 	$generateddbname = $contract->array_options['options_database_db'];
-	$generateddbport = ($contract->array_options['options_port_db']?$contract->array_options['options_port_db']:3306);
+	$generateddbport = ($contract->array_options['options_port_db'] ? $contract->array_options['options_port_db'] : 3306);
 	$generateddbusername = $contract->array_options['options_username_db'];
 	$generateddbpassword = $contract->array_options['options_password_db'];
 
 	$tmparray = explode('.', $contract->ref_customer, 2);
 	$sldAndSubdomain = $tmparray[0];
 	$domainname = $tmparray[1];
-	$tldid = '.'.$domainname;
-	$fqdninstance = $sldAndSubdomain.'.'.$domainname;
+	$tldid = '.' . $domainname;
+	$fqdninstance = $sldAndSubdomain . '.' . $domainname;
 }
-else
-{
-    // Check number of instance with same IP deployed (Rem: for partners, ip are the one of their customer)
-    $MAXDEPLOYMENTPERIP = (empty($conf->global->SELLYOURSAAS_MAXDEPLOYMENTPERIP)?20:$conf->global->SELLYOURSAAS_MAXDEPLOYMENTPERIP);
+else {
+	// Create thirdparty and contract with with generation of user and database names and passwords but without user nor database creation
+	// Check number of instance with same IP deployed (Rem: for partners, ip are the one of their customer)
+	$MAXDEPLOYMENTPERIP = (empty($conf->global->SELLYOURSAAS_MAXDEPLOYMENTPERIP) ? 20 : $conf->global->SELLYOURSAAS_MAXDEPLOYMENTPERIP);
 
-    $nbofinstancewithsameip=-1;
-    $select = 'SELECT COUNT(*) as nb FROM '.MAIN_DB_PREFIX."contrat_extrafields WHERE deployment_ip = '".$db->escape($remoteip)."'";
-    $select.= " AND deployment_status IN ('processing', 'done')";
-    $resselect = $db->query($select);
-    if ($resselect)
-    {
-        $objselect = $db->fetch_object($resselect);
-        if ($objselect) $nbofinstancewithsameip = $objselect->nb;
-    }
-    dol_syslog("nbofinstancewithsameip = ".$nbofinstancewithsameip." for ip ".$remoteip." (must be lower or equal than ".$MAXDEPLOYMENTPERIP." except if ip is 127.0.0.1)");
-    if ($remoteip != '127.0.0.1' && (($nbofinstancewithsameip < 0) || ($nbofinstancewithsameip > $MAXDEPLOYMENTPERIP)))
-    {
-        setEventMessages($langs->trans("TooManyInstancesForSameIp"), null, 'errors');
-        header("Location: ".$newurl);
-        exit(-1);
-    }
+	$nbofinstancewithsameip = -1;
+	$select = 'SELECT COUNT(*) as nb FROM ' . MAIN_DB_PREFIX . "contrat_extrafields WHERE deployment_ip = '" . $db->escape($remoteip) . "'";
+	$select .= " AND deployment_status IN ('processing', 'done')";
+	$resselect = $db->query($select);
+	if ($resselect) {
+		$objselect = $db->fetch_object($resselect);
+		if ($objselect) $nbofinstancewithsameip = $objselect->nb;
+	}
+	dol_syslog("nbofinstancewithsameip = " . $nbofinstancewithsameip . " for ip " . $remoteip . " (must be lower or equal than " . $MAXDEPLOYMENTPERIP . " except if ip is 127.0.0.1)");
+	if ($remoteip != '127.0.0.1' && (($nbofinstancewithsameip < 0) || ($nbofinstancewithsameip > $MAXDEPLOYMENTPERIP))) {
+		setEventMessages($langs->trans("TooManyInstancesForSameIp"), null, 'errors');
+		header("Location: " . $newurl);
+		exit(-1);
+	}
 
-    // Check number of instance with same IP on same hour
-    $MAXDEPLOYMENTPERIPPERHOUR = (empty($conf->global->SELLYOURSAAS_MAXDEPLOYMENTPERIPPERHOUR)?5:$conf->global->SELLYOURSAAS_MAXDEPLOYMENTPERIPPERHOUR);
+	// Check number of instance with same IP on same hour
+	$MAXDEPLOYMENTPERIPPERHOUR = (empty($conf->global->SELLYOURSAAS_MAXDEPLOYMENTPERIPPERHOUR) ? 5 : $conf->global->SELLYOURSAAS_MAXDEPLOYMENTPERIPPERHOUR);
 
-    $nbofinstancewithsameip=-1;
-    $select = 'SELECT COUNT(*) as nb FROM '.MAIN_DB_PREFIX."contrat_extrafields WHERE deployment_ip = '".$db->escape($remoteip)."'";
-    $select.= " AND deployment_date_start > '".$db->idate(dol_now() - 3600)."'";
-    $resselect = $db->query($select);
-    if ($resselect)
-    {
-        $objselect = $db->fetch_object($resselect);
-        if ($objselect) $nbofinstancewithsameip = $objselect->nb;
-    }
-    dol_syslog("nbofinstancewithsameipperhour = ".$nbofinstancewithsameip." for ip ".$remoteip." (must be lower or equal than ".$MAXDEPLOYMENTPERIPPERHOUR." except if ip is 127.0.0.1)");
-    if ($remoteip != '127.0.0.1' && (($nbofinstancewithsameip < 0) || ($nbofinstancewithsameip > $MAXDEPLOYMENTPERIP)))
-    {
-        setEventMessages($langs->trans("TooManyInstancesForSameIpThisHour"), null, 'errors');
-        header("Location: ".$newurl);
-        exit(-1);
-    }
+	$nbofinstancewithsameip = -1;
+	$select = 'SELECT COUNT(*) as nb FROM ' . MAIN_DB_PREFIX . "contrat_extrafields WHERE deployment_ip = '" . $db->escape($remoteip) . "'";
+	$select .= " AND deployment_date_start > '" . $db->idate(dol_now() - 3600) . "'";
+	$resselect = $db->query($select);
+	if ($resselect) {
+		$objselect = $db->fetch_object($resselect);
+		if ($objselect) $nbofinstancewithsameip = $objselect->nb;
+	}
+	dol_syslog("nbofinstancewithsameipperhour = " . $nbofinstancewithsameip . " for ip " . $remoteip . " (must be lower or equal than " . $MAXDEPLOYMENTPERIPPERHOUR . " except if ip is 127.0.0.1)");
+	if ($remoteip != '127.0.0.1' && (($nbofinstancewithsameip < 0) || ($nbofinstancewithsameip > $MAXDEPLOYMENTPERIP))) {
+		setEventMessages($langs->trans("TooManyInstancesForSameIpThisHour"), null, 'errors');
+		header("Location: " . $newurl);
+		exit(-1);
+	}
 
-    // Check if some deployment are already in process and ask to wait
-    $MAXDEPLOYMENTPARALLEL = 2;
-    $nbofinstanceindeployment=-1;
-    $select = 'SELECT COUNT(*) as nb FROM '.MAIN_DB_PREFIX."contrat_extrafields WHERE deployment_ip = '".$db->escape($remoteip)."'";
-    $select.= " AND deployment_status IN ('processing')";
-    $resselect = $db->query($select);
-    if ($resselect)
-    {
-        $objselect = $db->fetch_object($resselect);
-        if ($objselect) $nbofinstanceindeployment = $objselect->nb;
-    }
-    dol_syslog("nbofinstanceindeployment = ".$nbofinstanceindeployment." for ip ".$remoteip." (must be lower or equal than ".$MAXDEPLOYMENTPARALLEL." except if ip is 127.0.0.1)");
-    if ($remoteip != '127.0.0.1' && (($nbofinstanceindeployment < 0) || ($nbofinstanceindeployment > $MAXDEPLOYMENTPARALLEL)))
-    {
-        setEventMessages($langs->trans("TooManyRequestPleaseTryLater"), null, 'errors');
-        header("Location: ".$newurl);
-        exit(-1);
-    }
+	// Check if some deployment are already in process and ask to wait
+	$MAXDEPLOYMENTPARALLEL = 2;
+	$nbofinstanceindeployment = -1;
+	$select = 'SELECT COUNT(*) as nb FROM ' . MAIN_DB_PREFIX . "contrat_extrafields WHERE deployment_ip = '" . $db->escape($remoteip) . "'";
+	$select .= " AND deployment_status IN ('processing')";
+	$resselect = $db->query($select);
+	if ($resselect) {
+		$objselect = $db->fetch_object($resselect);
+		if ($objselect) $nbofinstanceindeployment = $objselect->nb;
+	}
+	dol_syslog("nbofinstanceindeployment = " . $nbofinstanceindeployment . " for ip " . $remoteip . " (must be lower or equal than " . $MAXDEPLOYMENTPARALLEL . " except if ip is 127.0.0.1)");
+	if ($remoteip != '127.0.0.1' && (($nbofinstanceindeployment < 0) || ($nbofinstanceindeployment > $MAXDEPLOYMENTPARALLEL))) {
+		setEventMessages($langs->trans("TooManyRequestPleaseTryLater"), null, 'errors');
+		header("Location: " . $newurl);
+		exit(-1);
+	}
 
-	$tmpthirdparty=new Societe($db);
-	if ($reusesocid > 0)
-	{
+	$tmpthirdparty = new Societe($db);
+	if ($reusesocid > 0) {
 		$result = $tmpthirdparty->fetch($reusesocid);
-		if ($result < 0)
-		{
-			dol_print_error_email('FETCHTP'.$reusesocid, $tmpthirdparty->error, $tmpthirdparty->errors, 'alert alert-error');
+		if ($result < 0) {
+			dol_print_error_email('FETCHTP' . $reusesocid, $tmpthirdparty->error, $tmpthirdparty->errors, 'alert alert-error');
 			exit(-1);
 		}
 
@@ -687,20 +658,21 @@ else
 		$thirdpartyidinsession = $_SESSION['dol_loginsellyoursaas'];
 		if ($fromsocid > 0) {
 			if ($thirdpartyidinsession != $fromsocid) {
-				dol_syslog("Instance creation blocked for ".$remoteip." - Try to create instance for reseller id = ".$fromsocid." when id in session is ".$thirdpartyidinsession);
+				dol_syslog("Instance creation blocked for " . $remoteip . " - Try to create instance for reseller id = " . $fromsocid . " when id in session is " . $thirdpartyidinsession);
 				setEventMessages($langs->trans("ErrorInvalidReuseIDSurelyAHackAttempt"), null, 'errors');
 				header("Location: index.php");
 				exit(-1);
 			}
 			if ($tmpthirdparty->parent != $thirdpartyidinsession) {
-				dol_syslog("Instance creation blocked for ".$remoteip." - Try to create instance for reseller id = ".$fromsocid." when existing customer has reseller id ".$tmpthirdparty->parent);
+				dol_syslog("Instance creation blocked for " . $remoteip . " - Try to create instance for reseller id = " . $fromsocid . " when existing customer has reseller id " . $tmpthirdparty->parent);
 				setEventMessages($langs->trans("ErrorInvalidReuseIDSurelyAHackAttempt"), null, 'errors');
 				header("Location: index.php");
 				exit(-1);
 			}
-		} else {
+		}
+		else {
 			if ($thirdpartyidinsession != $reusesocid && empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION)) {
-				dol_syslog("Instance creation blocked for ".$remoteip." - Try to create instance for thirdparty id = ".$reusesocid." when id in session is ".$thirdpartyidinsession);
+				dol_syslog("Instance creation blocked for " . $remoteip . " - Try to create instance for thirdparty id = " . $reusesocid . " when id in session is " . $thirdpartyidinsession);
 				setEventMessages($langs->trans("ErrorInvalidReuseIDSurelyAHackAttempt"), null, 'errors');
 				header("Location: index.php");
 				exit(-1);
@@ -714,34 +686,30 @@ else
 
 		$listofcontractid = array();
 		$sql = 'SELECT c.rowid as rowid';
-		$sql.= ' FROM '.MAIN_DB_PREFIX.'contrat as c LEFT JOIN '.MAIN_DB_PREFIX.'contrat_extrafields as ce ON ce.fk_object = c.rowid, '.MAIN_DB_PREFIX.'contratdet as d, '.MAIN_DB_PREFIX.'societe as s';
-		$sql.= " WHERE c.fk_soc = s.rowid AND s.rowid = ".$tmpthirdparty->id;
-		$sql.= " AND d.fk_contrat = c.rowid";
-		$sql.= " AND c.entity = ".$conf->entity;
-		$sql.= " AND ce.deployment_status IN ('processing', 'done', 'undeployed')";
-		$resql=$db->query($sql);
-		if ($resql)
-		{
+		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'contrat as c LEFT JOIN ' . MAIN_DB_PREFIX . 'contrat_extrafields as ce ON ce.fk_object = c.rowid, ' . MAIN_DB_PREFIX . 'contratdet as d, ' . MAIN_DB_PREFIX . 'societe as s';
+		$sql .= " WHERE c.fk_soc = s.rowid AND s.rowid = " . $tmpthirdparty->id;
+		$sql .= " AND d.fk_contrat = c.rowid";
+		$sql .= " AND c.entity = " . $conf->entity;
+		$sql .= " AND ce.deployment_status IN ('processing', 'done', 'undeployed')";
+		$resql = $db->query($sql);
+		if ($resql) {
 			$num_rows = $db->num_rows($resql);
 			$i = 0;
-			while ($i < $num_rows)
-			{
+			while ($i < $num_rows) {
 				$obj = $db->fetch_object($resql);
 				if ($obj) {
-					$listofcontractid[$obj->rowid]=$obj->rowid;
+					$listofcontractid[$obj->rowid] = $obj->rowid;
 				}
 				$i++;
 			}
 		}
 
-		if (count($listofcontractid) >= $MAXINSTANCES)
-		{
+		if (count($listofcontractid) >= $MAXINSTANCES) {
 			$sellyoursaasemail = $conf->global->SELLYOURSAAS_MAIN_EMAIL;
-			if (! empty($tmpthirdparty->array_options['options_domain_registration_page'])
-				&& $tmpthirdparty->array_options['options_domain_registration_page'] != $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME)
-			{
-				$newnamekey = 'SELLYOURSAAS_MAIN_EMAIL_FORDOMAIN-'.$tmpthirdparty->array_options['options_domain_registration_page'];
-				if (! empty($conf->global->$newnamekey)) $sellyoursaasemail = $conf->global->$newnamekey;
+			if (!empty($tmpthirdparty->array_options['options_domain_registration_page'])
+				&& $tmpthirdparty->array_options['options_domain_registration_page'] != $conf->global->SELLYOURSAAS_MAIN_DOMAIN_NAME) {
+				$newnamekey = 'SELLYOURSAAS_MAIN_EMAIL_FORDOMAIN-' . $tmpthirdparty->array_options['options_domain_registration_page'];
+				if (!empty($conf->global->$newnamekey)) $sellyoursaasemail = $conf->global->$newnamekey;
 			}
 
 			setEventMessages($langs->trans("MaxNumberOfInstanceReached", $MAXINSTANCES, $sellyoursaasemail), null, 'errors');
@@ -749,66 +717,79 @@ else
 			exit(-1);
 		}
 	}
-	else
-	{
+	else {
 		// Create thirdparty (if it already exists, do nothing and return a warning to user)
-		dol_syslog("Fetch thirdparty from email ".$email);
+		dol_syslog("Fetch thirdparty from email " . $email);
 		$result = $tmpthirdparty->fetch(0, '', '', '', '', '', '', '', '', '', $email);
-		if ($result < 0)
-		{
-			dol_print_error_email('FETCHTP'.$email, $tmpthirdparty->error, $tmpthirdparty->errors, 'alert alert-error');
+		if ($result < 0) {
+			dol_print_error_email('FETCHTP' . $email, $tmpthirdparty->error, $tmpthirdparty->errors, 'alert alert-error');
 			exit(-1);
 		}
-		else if ($result > 0)	// Found one record
+		else if ($result > 0)    // Found one record
 		{
 			setEventMessages($langs->trans("AccountAlreadyExistsForEmail", $conf->global->SELLYOURSAAS_ACCOUNT_URL), null, 'errors');
-			header("Location: ".$newurl);
+			header("Location: " . $newurl);
 			exit(-1);
 		}
 		else dol_syslog("Email not already used. Good.");
 	}
 
-	$fqdninstance = $sldAndSubdomain.$tldid;
+	$fqdninstance = $sldAndSubdomain . $tldid;
 
-	if ($productref != 'none')
-	{
+	if ($productref != 'none') {
 		$result = $contract->fetch(0, '', $fqdninstance);
-		if ($result > 0)
-		{
+		if ($result > 0) {
 			if (substr($sapi_type, 0, 3) != 'cli') {
 				// Instance ref already exists, we redirect to register page with appropriate error message
 				setEventMessages($langs->trans("InstanceNameAlreadyExists", $fqdninstance), null, 'errors');
-				header("Location: ".$newurl);
+				header("Location: " . $newurl);
 				exit(-1);
-			} else {
-				print $langs->trans("InstanceNameAlreadyExists", $fqdninstance)."\n";
+			}
+			else {
+				print $langs->trans("InstanceNameAlreadyExists", $fqdninstance) . "\n";
 				exit(-1);
 			}
 		}
 		else dol_syslog("Contract name not already used. Good.");
 	}
 
-	if (! empty($conf->global->SELLYOURSAAS_NAME_RESERVED) && preg_match('/'.$conf->global->SELLYOURSAAS_NAME_RESERVED.'/', $fqdninstance))
-	{
-	    // @TODO Exclude some thirdparties
+	if (!empty($conf->global->SELLYOURSAAS_NAME_RESERVED) && preg_match('/' . $conf->global->SELLYOURSAAS_NAME_RESERVED . '/', $fqdninstance)) {
+		// @TODO Exclude some thirdparties
 
 
-	    setEventMessages($langs->trans("InstanceNameReseved", $fqdninstance), null, 'errors');
-	    header("Location: ".$newurl);
-	    exit(-1);
+		setEventMessages($langs->trans("InstanceNameReseved", $fqdninstance), null, 'errors');
+		header("Location: " . $newurl);
+		exit(-1);
 	}
 
 	// Generate credentials
 
-	$generatedunixlogin = strtolower('osu'.substr(getRandomPassword(true, array('I')), 0, 9));		// Must be lowercase as it can be used for default email
+	$generatedunixlogin = strtolower('osu' . substr(getRandomPassword(true, array('I')), 0, 9));        // Must be lowercase as it can be used for default email
 	$generatedunixpassword = substr(getRandomPassword(true, array('I')), 0, 10);
 
-	$generateddbname = 'dbn'.substr(getRandomPassword(true, array('I')), 0, 8);
-	$generateddbusername = 'dbu'.substr(getRandomPassword(true, array('I')), 0, 9);
+	$generateddbname = 'dbn' . substr(getRandomPassword(true, array('I')), 0, 8);
+	$generateddbusername = 'dbu' . substr(getRandomPassword(true, array('I')), 0, 9);
 	$generateddbpassword = substr(getRandomPassword(true, array('I')), 0, 10);
-	$generateddbhostname = (! empty($conf->global->SELLYOURSAAS_FORCE_DATABASE_HOST) ? $conf->global->SELLYOURSAAS_FORCE_DATABASE_HOST : $sldAndSubdomain.'.'.$domainname);
-	$generateddbport = (! empty($conf->global->SELLYOURSAAS_FORCE_DATABASE_PORT) ? $conf->global->SELLYOURSAAS_FORCE_DATABASE_PORT : 3306);
-	$generatedunixhostname = $sldAndSubdomain.'.'.$domainname;
+	$generateddbhostname = (!empty($conf->global->SELLYOURSAAS_FORCE_DATABASE_HOST) ? $conf->global->SELLYOURSAAS_FORCE_DATABASE_HOST : $sldAndSubdomain . '.' . $domainname);
+	$generateddbport = (!empty($conf->global->SELLYOURSAAS_FORCE_DATABASE_PORT) ? $conf->global->SELLYOURSAAS_FORCE_DATABASE_PORT : 3357);
+	$fp = @fopen('/etc/sellyoursaas.conf', 'r');
+	if ($fp) {
+		$array = explode("\n", fread($fp, filesize('/etc/sellyoursaas.conf')));
+		foreach ($array as $val) {
+			$tmpline = explode("=", $val);
+			if ($tmpline[0] == 'databasehostdeployment') {
+				$generateddbhostname = $tmpline[1];
+			}
+			elseif ($tmpline[0] == 'databaseportdeployment') {
+				$generateddbport = $tmpline[1];
+			}
+		}
+	}
+	else {
+		print "Failed to open /etc/sellyoursaas.conf file\n";
+		exit(-1);
+	}
+	$generatedunixhostname = $sldAndSubdomain . '.' . $domainname;
 
 	// Create thirdparty
 
@@ -826,18 +807,17 @@ else
 	$tmpthirdparty->array_options['options_dolicloud'] = 'yesv2';
 	$tmpthirdparty->array_options['options_date_registration'] = dol_now();
 	$tmpthirdparty->array_options['options_domain_registration_page'] = getDomainFromURL($_SERVER["SERVER_NAME"], 1);
-	$tmpthirdparty->array_options['options_source']='REGISTERFORM'.($origin?'-'.$origin:'');
-    $tmpthirdparty->array_options['options_password'] = $password;
-    $tmpthirdparty->array_options['options_optinmessages'] = $optinmessages;
+	$tmpthirdparty->array_options['options_source'] = 'REGISTERFORM' . ($origin ? '-' . $origin : '');
+	$tmpthirdparty->array_options['options_password'] = $password;
+	$tmpthirdparty->array_options['options_optinmessages'] = $optinmessages;
 
-	if ($productref == 'none')	// If reseller
+	if ($productref == 'none')    // If reseller
 	{
 		$tmpthirdparty->fournisseur = 1;
 		$tmpthirdparty->array_options['options_commission'] = (empty($conf->global->SELLYOURSAAS_DEFAULT_COMMISSION) ? 25 : $conf->global->SELLYOURSAAS_DEFAULT_COMMISSION);
 	}
 
-	if ($country_code)
-	{
+	if ($country_code) {
 		$tmpthirdparty->country_id = getCountry($country_code, 3, $db);
 	}
 
@@ -845,118 +825,108 @@ else
 	// Start transaction
 	$db->begin();
 
-	if ($tmpthirdparty->id > 0)
-	{
-		if (empty($reusesocid))
-		{
+	if ($tmpthirdparty->id > 0) {
+		if (empty($reusesocid)) {
 			$result = $tmpthirdparty->update(0, $user);
-			if ($result <= 0)
-			{
+			if ($result <= 0) {
 				$db->rollback();
 				setEventMessages($tmpthirdparty->error, $tmpthirdparty->errors, 'errors');
-				header("Location: ".$newurl);
+				header("Location: " . $newurl);
 				exit(-1);
 			}
 		}
 	}
-	else
-	{
+	else {
 		// Set lang to backoffice language
 		$savlangs = $langs;
 		$langs = $langsen;
 
 		$tmpthirdparty->code_client = -1;
-        if ($productref == 'none')    // If reseller
-        {
-            $tmpthirdparty->code_fournisseur = -1;
-        }
-        if ($partner > 0) $tmpthirdparty->parent = $partner;        // Add link to parent/reseller
-
-        if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION))//Création du code de validation du nouveau client
-        {
-            $codevalid = randomAdalphanumericString(32);
-            $tmpthirdparty->array_options['options_code_validation'] = $codevalid;
-            $tmpthirdparty->array_options['options_oldpassword'] = $password;
-        }
-
-        $result = $tmpthirdparty->create($user);
-        if ($result <= 0) {
-            $db->rollback();
-            setEventMessages($tmpthirdparty->error, $tmpthirdparty->errors, 'errors');
-            header("Location: " . $newurl);
-            exit(-1);
-        }
-
-        // Restore lang to user/visitor language
-        $langs = $savlangs;
-    }
-
-	if (! empty($conf->global->SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG))
-	{
-		$result = $tmpthirdparty->setCategories(array($conf->global->SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG => $conf->global->SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG), 'customer');
-		if ($result < 0)
+		if ($productref == 'none')    // If reseller
 		{
+			$tmpthirdparty->code_fournisseur = -1;
+		}
+		if ($partner > 0) $tmpthirdparty->parent = $partner;        // Add link to parent/reseller
+
+		if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION))//Création du code de validation du nouveau client
+		{
+			$codevalid = randomAdalphanumericString(32);
+			$tmpthirdparty->array_options['options_code_validation'] = $codevalid;
+			$tmpthirdparty->array_options['options_oldpassword'] = $password;
+		}
+
+		$result = $tmpthirdparty->create($user);
+		if ($result <= 0) {
 			$db->rollback();
 			setEventMessages($tmpthirdparty->error, $tmpthirdparty->errors, 'errors');
-			header("Location: ".$newurl);
+			header("Location: " . $newurl);
+			exit(-1);
+		}
+
+		// Restore lang to user/visitor language
+		$langs = $savlangs;
+	}
+
+	if (!empty($conf->global->SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG)) {
+		$result = $tmpthirdparty->setCategories(array($conf->global->SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG => $conf->global->SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG), 'customer');
+		if ($result < 0) {
+			$db->rollback();
+			setEventMessages($tmpthirdparty->error, $tmpthirdparty->errors, 'errors');
+			header("Location: " . $newurl);
 			exit(-1);
 		}
 	}
-	else
-	{
+	else {
 		$db->rollback();
 		dol_print_error_email('SETUPTAG', 'Setup of module not complete. The default customer tag is not defined.', null, 'alert alert-error');
 		exit(-1);
-    }
+	}
 
-    if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && (substr($sapi_type, 0, 3) != 'cli') && empty($_GET['codevalid']) && empty($thirdpartyidinsession))//Envoi de mail et affichage de page d'information.
-    {
+	if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && (substr($sapi_type, 0, 3) != 'cli') && empty($_GET['codevalid']) && empty($thirdpartyidinsession))//Envoi de mail et affichage de page d'information.
+	{
 // Send email to customer
-        $sellyoursaasname = $conf->global->SELLYOURSAAS_NAME;
-        $sellyoursaasemailsupervision = $conf->global->SELLYOURSAAS_SUPERVISION_EMAIL;
-        $sellyoursaasemailnoreply = $conf->global->SELLYOURSAAS_NOREPLY_EMAIL;
+		$sellyoursaasname = $conf->global->SELLYOURSAAS_NAME;
+		$sellyoursaasemailsupervision = $conf->global->SELLYOURSAAS_SUPERVISION_EMAIL;
+		$sellyoursaasemailnoreply = $conf->global->SELLYOURSAAS_NOREPLY_EMAIL;
 
-        $domainname = getDomainFromURL($_SERVER['SERVER_NAME'], 1);
-        $constforaltname = 'SELLYOURSAAS_NAME_FORDOMAIN-' . $domainname;
-        $constforaltemailsupervision = 'SELLYOURSAAS_SUPERVISION_EMAIL-' . $domainname;
-        $constforaltemailnoreply = 'SELLYOURSAAS_NOREPLY_EMAIL-' . $domainname;
-        if (!empty($conf->global->$constforaltname)) {
-            $sellyoursaasdomain = $domainname;
-            $sellyoursaasname = $conf->global->$constforaltname;
-            $sellyoursaasemailsupervision = $conf->global->$constforaltemailsupervision;
-            $sellyoursaasemailnoreply = $conf->global->$constforaltemailnoreply;
-        }
+		$domainname = getDomainFromURL($_SERVER['SERVER_NAME'], 1);
+		$constforaltname = 'SELLYOURSAAS_NAME_FORDOMAIN-' . $domainname;
+		$constforaltemailsupervision = 'SELLYOURSAAS_SUPERVISION_EMAIL-' . $domainname;
+		$constforaltemailnoreply = 'SELLYOURSAAS_NOREPLY_EMAIL-' . $domainname;
+		if (!empty($conf->global->$constforaltname)) {
+			$sellyoursaasdomain = $domainname;
+			$sellyoursaasname = $conf->global->$constforaltname;
+			$sellyoursaasemailsupervision = $conf->global->$constforaltemailsupervision;
+			$sellyoursaasemailnoreply = $conf->global->$constforaltemailnoreply;
+		}
 
-        $to = $email;
-        $lien = $conf->global->SELLYOURSAAS_ACCOUNT_URL."/register_instance.php?reusesocid=$tmpthirdparty->id&codevalid=$codevalid&productref=$productref";
-        // We send email but only if not in Command Line mode
-        dol_syslog("Instance creation confirm, send email to customer (copy supervision)", LOG_ERR);
+		$to = $email;
+		$lien = $conf->global->SELLYOURSAAS_ACCOUNT_URL . "/register_instance.php?reusesocid=$tmpthirdparty->id&codevalid=$codevalid&productref=$productref";
+		// We send email but only if not in Command Line mode
+		dol_syslog("Instance creation confirm, send email to customer (copy supervision)", LOG_ERR);
 
-        $email = new CMailFile('Instance creation confirm - ' . dol_print_date(dol_now(), 'dayhourrfc'), $to, $sellyoursaasemailnoreply,
-            $langs->trans("confirm_account_and_instance_creation") . " :<br>\n <a href='$lien'>$lien</a><br>\n", array(), array(), array(), $sellyoursaasemailsupervision, '', 0, 1, '', '', '', '', 'emailing');
-        $email->sendfile();
-        print $langs->trans('A_validation_mail_has_been_sent')
-//        ."<br>\n".$langs->trans("A_validation_mail_has_been_sent1",$link1)."<br>\n".$langs->trans("A_validation_mail_has_been_sent2",$link2)
-        ;
+		$email = new CMailFile('Instance creation confirm - ' . dol_print_date(dol_now(), 'dayhourrfc'), $to, $sellyoursaasemailnoreply,
+			$langs->trans("confirm_account_and_instance_creation") . " :<br>\n <a href='$lien'>$lien</a><br>\n", array(), array(), array(), $sellyoursaasemailsupervision, '', 0, 1, '', '', '', '', 'emailing');
+		$email->sendfile();
+		print $langs->trans('A_validation_mail_has_been_sent')//        ."<br>\n".$langs->trans("A_validation_mail_has_been_sent1",$link1)."<br>\n".$langs->trans("A_validation_mail_has_been_sent2",$link2)
+		;
 		$db->commit();
-        exit(1);
+		exit(1);
 
-    }
+	}
 
-    if ($productref == 'none') {
-        if (!empty($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG)) {
+	if ($productref == 'none') {
+		if (!empty($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG)) {
 			$tmpthirdparty->name_alias = dol_sanitizeFileName($tmpthirdparty->name);
 			$result = $tmpthirdparty->setCategories(array($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG => $conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG), 'supplier');
-			if ($result < 0)
-			{
+			if ($result < 0) {
 				$db->rollback();
 				setEventMessages($tmpthirdparty->error, $tmpthirdparty->errors, 'errors');
-				header("Location: ".$newurl);
+				header("Location: " . $newurl);
 				exit(-1);
 			}
 		}
-		else
-		{
+		else {
 			$db->rollback();
 			dol_print_error_email('SETUPTAG', 'Setup of module not complete. The default reseller tag is not defined.', null, 'alert alert-error');
 			exit(-1);
@@ -970,20 +940,19 @@ else
 
 	// Create contract/instance
 
-	if (! $error && $productref != 'none')
-	{
+	if (!$error && $productref != 'none') {
 		dol_syslog("Create contract with deployment status 'Processing'");
 
-		$contract->ref_customer = $sldAndSubdomain.$tldid;
+		$contract->ref_customer = $sldAndSubdomain . $tldid;
 		$contract->socid = $tmpthirdparty->id;
 		$contract->commercial_signature_id = $user->id;
 		$contract->commercial_suivi_id = $user->id;
 		$contract->date_contrat = $now;
 		$contract->note_private = 'Contract created from the online instance registration form.';
 
-		$tmp=explode('.', $contract->ref_customer, 2);
-		$sldAndSubdomain=$tmp[0];
-		$domainname=$tmp[1];
+		$tmp = explode('.', $contract->ref_customer, 2);
+		$sldAndSubdomain = $tmp[0];
+		$domainname = $tmp[1];
 
 		dol_include_once('/sellyoursaas/class/sellyoursaasutils.class.php');
 		$sellyoursaasutils = new SellYourSaasUtils($db);
@@ -1001,7 +970,7 @@ else
 		$contract->array_options['options_hostname_os'] = $generatedunixhostname;
 		$contract->array_options['options_username_os'] = $generatedunixlogin;
 		$contract->array_options['options_password_os'] = $generatedunixpassword;
-		$contract->array_options['options_sshaccesstype'] = (empty($tmpproduct->array_options['options_sshaccesstype'])?0:$tmpproduct->array_options['options_sshaccesstype']);
+		$contract->array_options['options_sshaccesstype'] = (empty($tmpproduct->array_options['options_sshaccesstype']) ? 0 : $tmpproduct->array_options['options_sshaccesstype']);
 		$contract->array_options['options_hostname_db'] = $generateddbhostname;
 		$contract->array_options['options_database_db'] = $generateddbname;
 		$contract->array_options['options_port_db'] = $generateddbport;
@@ -1016,9 +985,8 @@ else
 		//$contract->array_options['options_nb_gb'] = 0.01;
 
 		// TODO Remove hardcoded code here
-		if (preg_match('/glpi|flyve/i', $productref) && GETPOST("tz_string"))
-		{
-		    $contract->array_options['options_custom_virtualhostline'] = 'php_value date.timezone "'.GETPOST("tz_string").'"';
+		if (preg_match('/glpi|flyve/i', $productref) && GETPOST("tz_string")) {
+			$contract->array_options['options_custom_virtualhostline'] = 'php_value date.timezone "' . GETPOST("tz_string") . '"';
 		}
 		$contract->array_options['options_timezone'] = GETPOST("tz_string");
 		$contract->array_options['options_deployment_ip'] = $remoteip;
@@ -1028,9 +996,9 @@ else
 
 		// Evaluate VPN probability with Getintel
 		$vpnproba = '';
-		$emailforvpncheck='contact+checkcustomer@mysaasdomainname.com';
-		if (! empty($conf->global->SELLYOURSAAS_GETIPINTEL_EMAIL)) $emailforvpncheck = $conf->global->SELLYOURSAAS_GETIPINTEL_EMAIL;
-		$url = 'http://check.getipintel.net/check.php?ip='.$remoteip.'&contact='.urlencode($emailforvpncheck).'&flag=f';
+		$emailforvpncheck = 'contact+checkcustomer@mysaasdomainname.com';
+		if (!empty($conf->global->SELLYOURSAAS_GETIPINTEL_EMAIL)) $emailforvpncheck = $conf->global->SELLYOURSAAS_GETIPINTEL_EMAIL;
+		$url = 'http://check.getipintel.net/check.php?ip=' . $remoteip . '&contact=' . urlencode($emailforvpncheck) . '&flag=f';
 		$result = getURLContent($url, 'GET', '', 1, array(), array('http', 'https'), 0);
 		/* The proxy check system will return negative values on error. For standard format (non-json), an additional HTTP 400 status code is returned
 			-1 Invalid no input
@@ -1043,22 +1011,21 @@ else
 		 */
 		if (is_array($result) && $result['http_code'] == 200 && isset($result['content'])) {
 			$vpnproba = price2num($result['content'], 2, 1);
-			$contract->array_options['options_deployment_ipquality'] .= 'geti-vpn='.round($vpnproba,2).';';
-		} else {
-			$contract->array_options['options_deployment_ipquality'] .= 'geti-check failed. http_code = '.dol_trunc($result['http_code'], 100).';';
+			$contract->array_options['options_deployment_ipquality'] .= 'geti-vpn=' . round($vpnproba, 2) . ';';
+		}
+		else {
+			$contract->array_options['options_deployment_ipquality'] .= 'geti-check failed. http_code = ' . dol_trunc($result['http_code'], 100) . ';';
 		}
 		$contract->array_options['options_deployment_vpn_proba'] = round($vpnproba, 2);
 
-		$prefix=dol_getprefix('');
-		$cookieregistrationa='DOLREGISTERA_'.$prefix;
-		$cookieregistrationb='DOLREGISTERB_'.$prefix;
-		$nbregistration = (int) $_COOKIE[$cookieregistrationa];
-		if (! empty($_COOKIE[$cookieregistrationa]))
-		{
+		$prefix = dol_getprefix('');
+		$cookieregistrationa = 'DOLREGISTERA_' . $prefix;
+		$cookieregistrationb = 'DOLREGISTERB_' . $prefix;
+		$nbregistration = (int)$_COOKIE[$cookieregistrationa];
+		if (!empty($_COOKIE[$cookieregistrationa])) {
 			$contract->array_options['options_cookieregister_counter'] = ($nbregistration ? $nbregistration : 1);
 		}
-		if (! empty($_COOKIE[$cookieregistrationb]))
-		{
+		if (!empty($_COOKIE[$cookieregistrationb])) {
 			$contract->array_options['options_cookieregister_previous_instance'] = dol_decode($_COOKIE[$cookieregistrationb]);
 		}
 
@@ -1068,14 +1035,14 @@ else
 		// Refused if VPN probability is too high
 		if (empty($abusetest) && !empty($conf->global->SELLYOURSAAS_VPN_PROBA_REFUSED)) {
 			if (empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && $vpnproba >= $conf->global->SELLYOURSAAS_VPN_PROBA_REFUSED) {
-				dol_syslog("Instance creation blocked for ".$remoteip." - VPN probability ".$vpnproba." is higher or equal than ".$conf->global->SELLYOURSAAS_VPN_PROBA_REFUSED);
+				dol_syslog("Instance creation blocked for " . $remoteip . " - VPN probability " . $vpnproba . " is higher or equal than " . $conf->global->SELLYOURSAAS_VPN_PROBA_REFUSED);
 				$abusetest = 1;
 			}
 		}
 
 		// Evaluate IP Quality, TOR or bad networks with IPQuality
 		if (empty($abusetest) && !empty($conf->global->SELLYOURSAAS_IPQUALITY_KEY)) {
-			include_once DOL_DOCUMENT_ROOT.'/core/lib/geturl.lib.php';
+			include_once DOL_DOCUMENT_ROOT . '/core/lib/geturl.lib.php';
 
 			// Retrieve additional (optional) data points which help us enhance fraud scores.
 			$user_agent = $_SERVER['HTTP_USER_AGENT'];
@@ -1110,7 +1077,8 @@ else
 			// Format Parameters
 			if (is_array($transaction_parameters) && count($transaction_parameters)) {
 				$formatted_parameters = http_build_query(array_merge($parameters, $transaction_parameters));
-			} else {
+			}
+			else {
 				$formatted_parameters = http_build_query($parameters);
 			}
 
@@ -1120,36 +1088,38 @@ else
 				$conf->global->SELLYOURSAAS_IPQUALITY_KEY,
 				$remoteip,
 				$formatted_parameters
-				);
+			);
 
 			$result = getURLContent($url);
 			if (is_array($result) && $result['http_code'] == 200 && !empty($result['content'])) {
 				try {
-					dol_syslog("Result of call of ipqualityscore: ".$result['content'], LOG_DEBUG);
+					dol_syslog("Result of call of ipqualityscore: " . $result['content'], LOG_DEBUG);
 					$jsonreponse = json_decode($result['content'], true);
-					dol_syslog("For ".$remoteip.", fraud_score=".$jsonreponse['fraud_score']." - is_crawler=".$jsonreponse['is_crawler']." - vpn=".$jsonreponse['vpn']." - recent_abuse=".$jsonreponse['recent_abuse']." - tor=".($jsonreponse['tor'] || $jsonreponse['active_tor']));
+					dol_syslog("For " . $remoteip . ", fraud_score=" . $jsonreponse['fraud_score'] . " - is_crawler=" . $jsonreponse['is_crawler'] . " - vpn=" . $jsonreponse['vpn'] . " - recent_abuse=" . $jsonreponse['recent_abuse'] . " - tor=" . ($jsonreponse['tor'] || $jsonreponse['active_tor']));
 					if ($jsonreponse['success']) {
-						if ($jsonreponse['recent_abuse'] && !empty($conf->global->SELLYOURSAAS_IPQUALITY_BLOCK_ABUSING_IP)) {	// Not recommanded if users are using shared IP
-							dol_syslog("Instance creation blocked for ".$remoteip." - This is an IP with recent abuse reported");
+						if ($jsonreponse['recent_abuse'] && !empty($conf->global->SELLYOURSAAS_IPQUALITY_BLOCK_ABUSING_IP)) {    // Not recommanded if users are using shared IP
+							dol_syslog("Instance creation blocked for " . $remoteip . " - This is an IP with recent abuse reported");
 							$abusetest = 2;
 						}
 						if ($jsonreponse['tor'] || $jsonreponse['active_tor']) {
-							dol_syslog("Instance creation blocked for ".$remoteip." - This is a TOR or evil IP - host=".$jsonreponse['host']);
+							dol_syslog("Instance creation blocked for " . $remoteip . " - This is a TOR or evil IP - host=" . $jsonreponse['host']);
 							$abusetest = 3;
 						}
-						$contract->array_options['options_deployment_ipquality'] .= 'ipq-tor='.(($jsonreponse['tor'] || $jsonreponse['active_tor']) ? 1 : 0).';';
-						$contract->array_options['options_deployment_ipquality'] .= 'ipq-vpn='.(($jsonreponse['vpn'] || $jsonreponse['active_vpn']) ? 1 : 0).';';
-						$contract->array_options['options_deployment_ipquality'] .= 'ipq-recent_abuse='.($jsonreponse['recent_abuse'] ? 1 : 0).';';
-						$contract->array_options['options_deployment_ipquality'] .= 'ipq-fraud_score='.$jsonreponse['fraud_score'].';';
-						$contract->array_options['options_deployment_ipquality'] .= 'ipq-host='.$jsonreponse['host'].';';
-					} else {
-						$contract->array_options['options_deployment_ipquality'] .= 'ipq-check failed. Success property not found. '.dol_trunc($result['content'], 100).';';
+						$contract->array_options['options_deployment_ipquality'] .= 'ipq-tor=' . (($jsonreponse['tor'] || $jsonreponse['active_tor']) ? 1 : 0) . ';';
+						$contract->array_options['options_deployment_ipquality'] .= 'ipq-vpn=' . (($jsonreponse['vpn'] || $jsonreponse['active_vpn']) ? 1 : 0) . ';';
+						$contract->array_options['options_deployment_ipquality'] .= 'ipq-recent_abuse=' . ($jsonreponse['recent_abuse'] ? 1 : 0) . ';';
+						$contract->array_options['options_deployment_ipquality'] .= 'ipq-fraud_score=' . $jsonreponse['fraud_score'] . ';';
+						$contract->array_options['options_deployment_ipquality'] .= 'ipq-host=' . $jsonreponse['host'] . ';';
 					}
-				} catch(Exception $e) {
-					$contract->array_options['options_deployment_ipquality'] .= 'ipq-check failed. Exception '.dol_trunc($e->getMessage(), 100).';';
+					else {
+						$contract->array_options['options_deployment_ipquality'] .= 'ipq-check failed. Success property not found. ' . dol_trunc($result['content'], 100) . ';';
+					}
+				} catch (Exception $e) {
+					$contract->array_options['options_deployment_ipquality'] .= 'ipq-check failed. Exception ' . dol_trunc($e->getMessage(), 100) . ';';
 				}
-			} else {
-				$contract->array_options['options_deployment_ipquality'] .= 'ipq-check failed. http_code = '.dol_trunc($result['http_code'], 100).';';
+			}
+			else {
+				$contract->array_options['options_deployment_ipquality'] .= 'ipq-check failed. http_code = ' . dol_trunc($result['http_code'], 100) . ';';
 			}
 		}
 
@@ -1160,9 +1130,9 @@ else
 		// Block for some IPs
 		if (empty($abusetest) && !empty($conf->global->SELLYOURSAAS_BLACKLIST_IP_MASKS)) {
 			$arrayofblacklistips = explode(',', $conf->global->SELLYOURSAAS_BLACKLIST_IP_MASKS);
-			foreach($arrayofblacklistips as $blacklistip) {
+			foreach ($arrayofblacklistips as $blacklistip) {
 				if ($remoteip == $blacklistip) {
-					dol_syslog("Instance creation blocked for ".$remoteip." - This IP is in blacklist SELLYOURSAAS_BLACKLIST_IP_MASKS");
+					dol_syslog("Instance creation blocked for " . $remoteip . " - This IP is in blacklist SELLYOURSAAS_BLACKLIST_IP_MASKS");
 					$abusetest = 4;
 				}
 			}
@@ -1172,9 +1142,9 @@ else
 		if (empty($abusetest) && !empty($conf->global->SELLYOURSAAS_BLACKLIST_IP_MASKS_FOR_VPN)) {
 			if ($vpnproba >= (empty($conf->global->SELLYOURSAAS_VPN_PROBA_FOR_BLACKLIST) ? 1 : $conf->global->SELLYOURSAAS_VPN_PROBA_FOR_BLACKLIST)) {
 				$arrayofblacklistips = explode(',', $conf->global->SELLYOURSAAS_BLACKLIST_IP_MASKS_FOR_VPN);
-				foreach($arrayofblacklistips as $blacklistip) {
+				foreach ($arrayofblacklistips as $blacklistip) {
 					if ($remoteip == $blacklistip) {
-						dol_syslog("Instance creation blocked for ".$remoteip." - This IP is in blacklist SELLYOURSAAS_BLACKLIST_IP_MASKS_FOR_VPN");
+						dol_syslog("Instance creation blocked for " . $remoteip . " - This IP is in blacklist SELLYOURSAAS_BLACKLIST_IP_MASKS_FOR_VPN");
 						$abusetest = 5;
 					}
 				}
@@ -1184,19 +1154,16 @@ else
 		if ($abusetest) {
 			$db->rollback();
 			$emailtowarn = $conf->global->MAIN_INFO_SOCIETE_MAIL;
-			dol_syslog("InstanceCreationBlockedForSecurityPurpose ip ".$remoteip." is refused with value abusetest=".$abusetest, LOG_DEBUG);
+			dol_syslog("InstanceCreationBlockedForSecurityPurpose ip " . $remoteip . " is refused with value abusetest=" . $abusetest, LOG_DEBUG);
 			setEventMessages($langs->trans("InstanceCreationBlockedForSecurityPurpose", $emailtowarn, $remoteip), null, 'errors');
 			//http_response_code(403);
-			header("Location: ".$newurl);
+			header("Location: " . $newurl);
 			exit(-1);
 		}
 
 
-
-
 		$result = $contract->create($user);
-		if ($result <= 0)
-		{
+		if ($result <= 0) {
 			$db->rollback();
 			dol_print_error_email('CREATECONTRACT', $contract->error, $contract->errors, 'alert alert-error');
 			exit(-1);
@@ -1205,12 +1172,10 @@ else
 
 
 	// Create contract line for INSTANCE
-	if (! $error && $productref != 'none')
-	{
-		dol_syslog("Add line to contract for INSTANCE with freeperioddays = ".$freeperioddays);
+	if (!$error && $productref != 'none') {
+		dol_syslog("Add line to contract for INSTANCE with freeperioddays = " . $freeperioddays);
 
-		if (empty($object->country_code))
-		{
+		if (empty($object->country_code)) {
 			$object->country_code = dol_getIdFromCode($db, $object->country_id, 'c_country', 'rowid', 'code');
 		}
 
@@ -1234,8 +1199,7 @@ else
 		}
 
 		$contractlineid = $contract->addline($desc, $price, $qty, $vat, $localtax1_tx, $localtax2_tx, $productidtocreate, $discount, $date_start, $date_end, 'HT', 0);
-		if ($contractlineid < 0)
-		{
+		if ($contractlineid < 0) {
 			dol_print_error_email('CREATECONTRACTLINE1', $contract->error, $contract->errors, 'alert alert-error');
 			exit(-1);
 		}
@@ -1244,19 +1208,17 @@ else
 	//var_dump('user:'.$dolicloudcustomer->price_user);
 	//var_dump('instance:'.$dolicloudcustomer->price_instance);
 
-	$j=1;
+	$j = 1;
 
 	// Create contract line for other products
-	if (! $error && $productref != 'none')
-	{
+	if (!$error && $productref != 'none') {
 		dol_syslog("Add line to contract for depending products (like USERS or options)");
 
-		$prodschild = $tmpproduct->getChildsArbo($tmpproduct->id,1);
+		$prodschild = $tmpproduct->getChildsArbo($tmpproduct->id, 1);
 
 		$tmpsubproduct = new Product($db);
-		foreach($prodschild as $prodid => $arrayprodid)
-		{
-			$tmpsubproduct->fetch($prodid);	// To load the price
+		foreach ($prodschild as $prodid => $arrayprodid) {
+			$tmpsubproduct->fetch($prodid);    // To load the price
 
 			$qty = 1;
 			//if (! empty($contract->array_options['options_nb_users'])) $qty = $contract->array_options['options_nb_users'];
@@ -1271,29 +1233,25 @@ else
 			}
 			$discount = 0;
 
-			if ($qty > 0)
-			{
+			if ($qty > 0) {
 				$j++;
 
 				$contractlineid = $contract->addline($desc, $price, $qty, $vat, $localtax1_tx, $localtax2_tx, $prodid, $discount, $date_start, $date_end, 'HT', 0);
-				if ($contractlineid < 0)
-				{
-					dol_print_error_email('CREATECONTRACTLINE'.$j, $contract->error, $contract->errors, 'alert alert-error');
+				if ($contractlineid < 0) {
+					dol_print_error_email('CREATECONTRACTLINE' . $j, $contract->error, $contract->errors, 'alert alert-error');
 					exit(-1);
 				}
 			}
 		}
 	}
 
-	dol_syslog("Reload all lines after creation (".$j." lines in contract) to have contract->lines ok");
+	dol_syslog("Reload all lines after creation (" . $j . " lines in contract) to have contract->lines ok");
 	$contract->fetch_lines();
 
-	if (! $error)
-	{
+	if (!$error) {
 		$db->commit();
 	}
-	else
-	{
+	else {
 		$db->rollback();
 	}
 }
@@ -1314,67 +1272,60 @@ else
 // With new method, call the deploy server
 // -----------------------------------------------------------------------------------------------------------------------
 
-if (! $error && $productref != 'none')
-{
+if (!$error && $productref != 'none') {
 	dol_include_once('/sellyoursaas/class/sellyoursaasutils.class.php');
 	$sellyoursaasutils = new SellYourSaasUtils($db);
 
-	$comment = 'Deploy instance '.$contract->ref;
+	$comment = 'Deploy instance ' . $contract->ref;
 
 	$result = $sellyoursaasutils->sellyoursaasRemoteAction('deployall', $contract, 'admin', $email, $password, '0', $comment, 300);
-	if ($result <= 0)
-	{
+	if ($result <= 0) {
 		$error++;
-		$errormessages=$sellyoursaasutils->errors;
-		if ($sellyoursaasutils->error) $errormessages[]=$sellyoursaasutils->error;
+		$errormessages = $sellyoursaasutils->errors;
+		if ($sellyoursaasutils->error) $errormessages[] = $sellyoursaasutils->error;
 	}
 }
 
 
 // Finish deployall - Activate all lines
-if (! $error && $productref != 'none')
-{
+if (!$error && $productref != 'none') {
 	dol_syslog("Activate all lines - by register_instance");
 
-	$contract->context['deployallwasjustdone']=1;		// Add a key so trigger into activateAll will know we have just made a "deployall"
+	$contract->context['deployallwasjustdone'] = 1;        // Add a key so trigger into activateAll will know we have just made a "deployall"
 
-	if ($fromsocid) $comment = 'Activation after deployment from instance creation by reseller id='.$fromsocid;
+	if ($fromsocid) $comment = 'Activation after deployment from instance creation by reseller id=' . $fromsocid;
 	else $comment = 'Activation after deployment from online registration or dashboard';
 
-	$result = $contract->activateAll($user, dol_now(), 1, $comment);			// This may execute the triggers
-	if ($result <= 0)
-	{
+	$result = $contract->activateAll($user, dol_now(), 1, $comment);            // This may execute the triggers
+	if ($result <= 0) {
 		$error++;
-		$errormessages[]=$contract->error;
-		$errormessages[]=array_merge($contract->errors, $errormessages);
+		$errormessages[] = $contract->error;
+		$errormessages[] = array_merge($contract->errors, $errormessages);
 	}
 }
 
 // End of deployment is now OK / Complete
-if (! $error && $productref != 'none')
-{
+if (!$error && $productref != 'none') {
 	$contract->array_options['options_deployment_status'] = 'done';
 	$contract->array_options['options_deployment_date_end'] = dol_now();
 	$contract->array_options['options_undeployment_date'] = '';
 	$contract->array_options['options_undeployment_ip'] = '';
 
 	// Clear password, we don't need it anymore.
-	if (empty($conf->global->SELLYOURSAAS_KEEP_INIT_ADMINPASS))
-	{
-	   $contract->array_options['options_deployment_init_adminpass'] = '';
+	if (empty($conf->global->SELLYOURSAAS_KEEP_INIT_ADMINPASS)) {
+		$contract->array_options['options_deployment_init_adminpass'] = '';
 	}
 
 	// Set cookie to store last registered instance
-	$prefix=dol_getprefix('');
-	$cookieregistrationa='DOLREGISTERA_'.$prefix;
-	$cookieregistrationb='DOLREGISTERB_'.$prefix;
-	$nbregistration = ((int) $_COOKIE[$cookieregistrationa] + 1);
-	setcookie($cookieregistrationa, $nbregistration, 0, "/", null, false, true);	// Cookie to count nb of registration from this computer
-	setcookie($cookieregistrationb, dol_encode($contract->ref_customer), 0, "/", null, false, true);					// Cookie to save previous registered instance
+	$prefix = dol_getprefix('');
+	$cookieregistrationa = 'DOLREGISTERA_' . $prefix;
+	$cookieregistrationb = 'DOLREGISTERB_' . $prefix;
+	$nbregistration = ((int)$_COOKIE[$cookieregistrationa] + 1);
+	setcookie($cookieregistrationa, $nbregistration, 0, "/", null, false, true);    // Cookie to count nb of registration from this computer
+	setcookie($cookieregistrationb, dol_encode($contract->ref_customer), 0, "/", null, false, true);                    // Cookie to save previous registered instance
 
 	$result = $contract->update($user);
-	if ($result < 0)
-	{
+	if ($result < 0) {
 		// We ignore errors. This should not happen in real life.
 		//setEventMessages($contract->error, $contract->errors, 'errors');
 	}
@@ -1383,99 +1334,93 @@ if (! $error && $productref != 'none')
 
 // Go to dashboard with login session forced
 
-if (! $error)
-{
+if (!$error) {
 	// Deployment is complete and finished.
 	// First time we go at end of process, so we send en email.
 
-	if ($productref == 'none')
-	{
+	if ($productref == 'none') {
 		$fromsocid = $tmpthirdparty->id;
 	}
 
-	$newurl=$_SERVER["PHP_SELF"];
-	$newurl=preg_replace('/register_instance\.php/', 'index.php?welcomecid='.$contract->id.(($fromsocid > 0)?'&fromsocid='.$fromsocid:''), $newurl);
+	$newurl = $_SERVER["PHP_SELF"];
+	$newurl = preg_replace('/register_instance\.php/', 'index.php?welcomecid=' . $contract->id . (($fromsocid > 0) ? '&fromsocid=' . $fromsocid : ''), $newurl);
 
-	$anonymoususer=new User($db);
+	$anonymoususer = new User($db);
 	$anonymoususer->fetch($conf->global->SELLYOURSAAS_ANONYMOUSUSER);
-	$_SESSION['dol_login']=$anonymoususer->login;				// Set dol_login in session so for next page index.php we will load, we are already logged.
+	$_SESSION['dol_login'] = $anonymoususer->login;                // Set dol_login in session so for next page index.php we will load, we are already logged.
 
-	if ($fromsocid > 0) $_SESSION['dol_loginsellyoursaas']=$fromsocid;
-	else $_SESSION['dol_loginsellyoursaas']=$contract->thirdparty->id;
+	if ($fromsocid > 0) $_SESSION['dol_loginsellyoursaas'] = $fromsocid;
+	else $_SESSION['dol_loginsellyoursaas'] = $contract->thirdparty->id;
 
-	$_SESSION['initialapplogin']='admin';
-	$_SESSION['initialapppassword']=$password;
+	$_SESSION['initialapplogin'] = 'admin';
+	$_SESSION['initialapppassword'] = $password;
 
-	if (! $disablecustomeremail)	// In most cases this test is true
+	if (!$disablecustomeremail)    // In most cases this test is true
 	{
 		// Send deployment email
-		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
-		include_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
-		$formmail=new FormMail($db);
+		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
+		include_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+		$formmail = new FormMail($db);
 
 		$emailtemplate = '';
-		if ($productref != 'none')
-		{
+		if ($productref != 'none') {
 			$emailtemplate = 'InstanceDeployed';
-			$arraydefaultmessage=$formmail->getEMailTemplate($db, 'contract', $user, $langs, 0, 1, $emailtemplate);		// Templates were initialiazed into data.sql
+			$arraydefaultmessage = $formmail->getEMailTemplate($db, 'contract', $user, $langs, 0, 1, $emailtemplate);        // Templates were initialiazed into data.sql
 		}
-		else
-		{
+		else {
 			$emailtemplate = '(ChannelPartnerCreated)';
-			$arraydefaultmessage=$formmail->getEMailTemplate($db, 'thirdparty', $user, $langs, 0, 1, $emailtemplate);	// Templates were initialized into data.sql
+			$arraydefaultmessage = $formmail->getEMailTemplate($db, 'thirdparty', $user, $langs, 0, 1, $emailtemplate);    // Templates were initialized into data.sql
 		}
 
-		$substitutionarray=getCommonSubstitutionArray($langs, 0, null, $contract);
-		$substitutionarray['__PACKAGEREF__']=$tmppackage->ref;
-		$substitutionarray['__PACKAGELABEL__']=$tmppackage->label;
-		$substitutionarray['__PACKAGEEMAILHEADER__']=$tmppackage->header;	// TODO
-		$substitutionarray['__PACKAGEEMAILFOOTER__']=$tmppackage->footer;	// TODO
-		$substitutionarray['__APPUSERNAME__']=$_SESSION['initialapplogin'];
-		$substitutionarray['__APPPASSWORD__']=$password;
+		$substitutionarray = getCommonSubstitutionArray($langs, 0, null, $contract);
+		$substitutionarray['__PACKAGEREF__'] = $tmppackage->ref;
+		$substitutionarray['__PACKAGELABEL__'] = $tmppackage->label;
+		$substitutionarray['__PACKAGEEMAILHEADER__'] = $tmppackage->header;    // TODO
+		$substitutionarray['__PACKAGEEMAILFOOTER__'] = $tmppackage->footer;    // TODO
+		$substitutionarray['__APPUSERNAME__'] = $_SESSION['initialapplogin'];
+		$substitutionarray['__APPPASSWORD__'] = $password;
 
 		// TODO Replace this with $tmppackage->header and $tmppackage->footer
-		dol_syslog('Set substitution var for __EMAIL_FOOTER__ with $tmppackage->ref='.strtoupper($tmppackage->ref));
-		$substitutionarray['__EMAIL_FOOTER__']='';
+		dol_syslog('Set substitution var for __EMAIL_FOOTER__ with $tmppackage->ref=' . strtoupper($tmppackage->ref));
+		$substitutionarray['__EMAIL_FOOTER__'] = '';
 		if ($emailtemplate) {
-			if ($langs->trans("EMAIL_FOOTER_".strtoupper($tmppackage->ref)) != "EMAIL_FOOTER_".strtoupper($tmppackage->ref)) {
-				$substitutionarray['__EMAIL_FOOTER__'] = $langs->trans("EMAIL_FOOTER_".strtoupper($tmppackage->ref));
+			if ($langs->trans("EMAIL_FOOTER_" . strtoupper($tmppackage->ref)) != "EMAIL_FOOTER_" . strtoupper($tmppackage->ref)) {
+				$substitutionarray['__EMAIL_FOOTER__'] = $langs->trans("EMAIL_FOOTER_" . strtoupper($tmppackage->ref));
 			}
 		}
 
 		complete_substitutions_array($substitutionarray, $langs, $contract);
 
 		$subject = make_substitutions($arraydefaultmessage->topic, $substitutionarray, $langs);
-		$msg     = make_substitutions($arraydefaultmessage->content, $substitutionarray, $langs);
+		$msg = make_substitutions($arraydefaultmessage->content, $substitutionarray, $langs);
 
 		$sellyoursaasemailnoreply = $conf->global->SELLYOURSAAS_NOREPLY_EMAIL;
 
-		$domainname=getDomainFromURL($_SERVER['SERVER_NAME'], 1);
-		$constforaltemailnoreply = 'SELLYOURSAAS_NOREPLY_EMAIL-'.$domainname;
-		if (! empty($conf->global->$constforaltemailnoreply))
-		{
+		$domainname = getDomainFromURL($_SERVER['SERVER_NAME'], 1);
+		$constforaltemailnoreply = 'SELLYOURSAAS_NOREPLY_EMAIL-' . $domainname;
+		if (!empty($conf->global->$constforaltemailnoreply)) {
 			$sellyoursaasemailnoreply = $conf->global->$constforaltemailnoreply;
 		}
 
 		$to = $contract->thirdparty->email;
 
-		$trackid = 'thi'.$_SESSION['dol_loginsellyoursaas'];
+		$trackid = 'thi' . $_SESSION['dol_loginsellyoursaas'];
 
 		$cmail = new CMailFile($subject, $to, $sellyoursaasemailnoreply, $msg, array(), array(), array(), '', '', 0, 1, '', '', $trackid);
 		$result = $cmail->sendfile();
-		if (! $result)
-		{
+		if (!$result) {
 			$error++;
 			setEventMessages($cmail->error, $cmail->errors, 'warnings');
 		}
 	}
-	else	// In rare cases, we are here
+	else    // In rare cases, we are here
 	{
 		setEventMessages('NoEmailSent', null, 'warnings');
 	}
 
 	if (substr($sapi_type, 0, 3) != 'cli') {
 		dol_syslog("Deployment successful");
-		header("Location: ".$newurl);
+		header("Location: " . $newurl);
 	}
 	else {
 		print "Instance created\n";
@@ -1488,48 +1433,42 @@ if (! $error)
 
 dol_syslog("Deployment error");
 
-if ($reusecontractid > 0)
-{
+if ($reusecontractid > 0) {
 	setEventMessages('', $errormessages, 'errors');
-	header("Location: ".$newurl);
+	header("Location: " . $newurl);
 	exit(-1);
 }
 
 
 // If we are here, there was an error
-if ($productref != 'none')
-{
-    $errormessages[] = 'Deployement of instance '.$sldAndSubdomain.$tldid.' from '.($remoteip?$remoteip:'localhost').' started but failed.';
+if ($productref != 'none') {
+	$errormessages[] = 'Deployement of instance ' . $sldAndSubdomain . $tldid . ' from ' . ($remoteip ? $remoteip : 'localhost') . ' started but failed.';
 }
-else
-{
-	$errormessages[] = 'Creation of account '.$email.' from '.($remoteip?$remoteip:'localhost').' has failed.';
+else {
+	$errormessages[] = 'Creation of account ' . $email . ' from ' . ($remoteip ? $remoteip : 'localhost') . ' has failed.';
 }
 $errormessages[] = $langs->trans("OurTeamHasBeenAlerted");
 
 // Force reload ot thirdparty
-if (is_object($contract) && method_exists($contract, 'fetch_thirdparty'))
-{
-    $contract->fetch_thirdparty();
+if (is_object($contract) && method_exists($contract, 'fetch_thirdparty')) {
+	$contract->fetch_thirdparty();
 }
 
 // Send email to customer
-if (is_object($contract->thirdparty))
-{
+if (is_object($contract->thirdparty)) {
 	$sellyoursaasname = $conf->global->SELLYOURSAAS_NAME;
 	$sellyoursaasemailsupervision = $conf->global->SELLYOURSAAS_SUPERVISION_EMAIL;
 	$sellyoursaasemailnoreply = $conf->global->SELLYOURSAAS_NOREPLY_EMAIL;
 
-	$domainname=getDomainFromURL($_SERVER['SERVER_NAME'], 1);
-	$constforaltname = 'SELLYOURSAAS_NAME_FORDOMAIN-'.$domainname;
-	$constforaltemailsupervision = 'SELLYOURSAAS_SUPERVISION_EMAIL-'.$domainname;
-	$constforaltemailnoreply = 'SELLYOURSAAS_NOREPLY_EMAIL-'.$domainname;
-	if (! empty($conf->global->$constforaltname))
-	{
-	    $sellyoursaasdomain = $domainname;
-	    $sellyoursaasname = $conf->global->$constforaltname;
-	    $sellyoursaasemailsupervision = $conf->global->$constforaltemailsupervision;
-	    $sellyoursaasemailnoreply = $conf->global->$constforaltemailnoreply;
+	$domainname = getDomainFromURL($_SERVER['SERVER_NAME'], 1);
+	$constforaltname = 'SELLYOURSAAS_NAME_FORDOMAIN-' . $domainname;
+	$constforaltemailsupervision = 'SELLYOURSAAS_SUPERVISION_EMAIL-' . $domainname;
+	$constforaltemailnoreply = 'SELLYOURSAAS_NOREPLY_EMAIL-' . $domainname;
+	if (!empty($conf->global->$constforaltname)) {
+		$sellyoursaasdomain = $domainname;
+		$sellyoursaasname = $conf->global->$constforaltname;
+		$sellyoursaasemailsupervision = $conf->global->$constforaltemailsupervision;
+		$sellyoursaasemailnoreply = $conf->global->$constforaltemailnoreply;
 	}
 
 	$to = $contract->thirdparty->email;
@@ -1538,9 +1477,10 @@ if (is_object($contract->thirdparty))
 		// We send email but only if not in Command Line mode
 		dol_syslog("Error in deployment, send email to customer (copy supervision)", LOG_ERR);
 
-		$email = new CMailFile('['.$sellyoursaasname.'] Registration/deployment temporary error - '.dol_print_date(dol_now(), 'dayhourrfc'), $to, $sellyoursaasemailnoreply, $langs->trans("AnErrorOccuredDuringDeployment")."<br>\n".join("<br>\n",$errormessages)."<br>\n", array(), array(), array(), $sellyoursaasemailsupervision, '', 0, -1, '', '', '', '', 'emailing');
+		$email = new CMailFile('[' . $sellyoursaasname . '] Registration/deployment temporary error - ' . dol_print_date(dol_now(), 'dayhourrfc'), $to, $sellyoursaasemailnoreply, $langs->trans("AnErrorOccuredDuringDeployment") . "<br>\n" . join("<br>\n", $errormessages) . "<br>\n", array(), array(), array(), $sellyoursaasemailsupervision, '', 0, -1, '', '', '', '', 'emailing');
 		$email->sendfile();
-	} else {
+	}
+	else {
 		dol_syslog("Error in deployment, no email sent because we are in CLI mode", LOG_ERR);
 	}
 }
@@ -1549,92 +1489,94 @@ if (is_object($contract->thirdparty))
 $conf->dol_hide_topmenu = 1;
 $conf->dol_hide_leftmenu = 1;
 
-$favicon=getDomainFromURL($_SERVER['SERVER_NAME'], 0);
-if (! preg_match('/\.(png|jpg)$/', $favicon)) $favicon.='.png';
-if (! empty($conf->global->MAIN_FAVICON_URL)) $favicon=$conf->global->MAIN_FAVICON_URL;
+$favicon = getDomainFromURL($_SERVER['SERVER_NAME'], 0);
+if (!preg_match('/\.(png|jpg)$/', $favicon)) $favicon .= '.png';
+if (!empty($conf->global->MAIN_FAVICON_URL)) $favicon = $conf->global->MAIN_FAVICON_URL;
 
-if ($favicon) $head.='<link rel="icon" href="img/'.$favicon.'">'."\n";
-$head.='<!-- Bootstrap core CSS -->
+if ($favicon) $head .= '<link rel="icon" href="img/' . $favicon . '">' . "\n";
+$head .= '<!-- Bootstrap core CSS -->
 <!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.css" rel="stylesheet">-->
 <link href="dist/css/bootstrap.css" rel="stylesheet">
 <link href="dist/css/myaccount.css" rel="stylesheet">';
 
-$title = $langs->trans("Registration").($tmpproduct->label?' ('.$tmpproduct->label.')':'');
+$title = $langs->trans("Registration") . ($tmpproduct->label ? ' (' . $tmpproduct->label . ')' : '');
 
 llxHeader($head, $title, '', '', 0, 0, array(), array('../dist/css/myaccount.css'));
 
 ?>
 
-<div id="waitMask" style="display:none;">
-    <font size="3em" style="color:#888; font-weight: bold;"><?php echo $langs->trans("InstallingInstance") ?><br><?php echo $langs->trans("PleaseWait") ?><br></font>
-    <img id="waitMaskImg" width="100px" src="<?php echo 'ajax-loader.gif'; ?>" alt="Loading" />
-</div>
+	<div id="waitMask" style="display:none;">
+		<font size="3em" style="color:#888; font-weight: bold;"><?php echo $langs->trans("InstallingInstance") ?>
+			<br><?php echo $langs->trans("PleaseWait") ?><br></font>
+		<img id="waitMaskImg" width="100px" src="<?php echo 'ajax-loader.gif'; ?>" alt="Loading"/>
+	</div>
 
-<div class="signup">
+	<div class="signup">
 
-      <div style="text-align: center;">
-        <?php
-        $linklogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&file='.urlencode('logos/thumbs/'.$conf->global->SELLYOURSAAS_LOGO_SMALL);
-
-        if (GETPOST('partner','alpha'))
-        {
-            $tmpthirdparty = new Societe($db);
-            $result = $tmpthirdparty->fetch(GETPOST('partner','alpha'));
-            $logo = $tmpthirdparty->logo;
-        }
-        print '<img style="center" class="logoheader"  src="'.$linklogo.'" id="logo" />';
-        ?>
-      </div>
-      <div class="block medium">
-
-        <header class="inverse">
-          <h1><?php echo $langs->trans("Registration") ?> <small><?php echo ($tmpproduct->label?' - '.$tmpproduct->label:''); ?></small></h1>
-        </header>
-
-
-      <form action="register_instance" method="post" id="formregister">
-        <div class="form-content">
-    	  <input type="hidden" name="token" value="<?php echo newToken(); ?>" />
-          <input type="hidden" name="service" value="<?php echo dol_escape_htmltag($tmpproduct->ref); ?>" />
-          <input type="hidden" name="extcss" value="<?php echo dol_escape_htmltag($extcss); ?>" />
-          <input type="hidden" name="package" value="<?php echo dol_escape_htmltag($tmppackage->ref); ?>" />
-          <input type="hidden" name="partner" value="<?php echo dol_escape_htmltag($partner); ?>" />
-          <input type="hidden" name="disablecustomeremail" value="<?php echo dol_escape_htmltag($disablecustomeremail); ?>" />
-
-          <section id="enterUserAccountDetails">
-
-			<center>OOPS...</center>
+		<div style="text-align: center;">
 			<?php
-			dol_print_error_email('DEPLOY'.$generateddbhostname, '', $errormessages, 'alert alert-error');
-            /*
-			$sellyoursaasname = $conf->global->SELLYOURSAAS_NAME;
-			$sellyoursaasemail = $conf->global->SELLYOURSAAS_SUPERVISION_EMAIL;
-			$sellyoursaasemailnoreply = $conf->global->SELLYOURSAAS_NOREPLY_EMAIL;
+			$linklogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&file=' . urlencode('logos/thumbs/' . $conf->global->SELLYOURSAAS_LOGO_SMALL);
 
-			$domainname=getDomainFromURL($_SERVER['SERVER_NAME'], 1);
-			$constforaltname = 'SELLYOURSAAS_NAME_FORDOMAIN-'.$domainname;
-			$constforaltemailto = 'SELLYOURSAAS_SUPERVISION_EMAIL-'.$domainname;
-			$constforaltemailnoreply = 'SELLYOURSAAS_NOREPLY_EMAIL-'.$domainname;
-			if (! empty($conf->global->$constforaltname))
-			{
-			    $sellyoursaasdomain = $domainname;
-			    $sellyoursaasname = $conf->global->$constforaltname;
-			    $sellyoursaasemail = $conf->global->$constforaltemailto;
-			    $sellyoursaasemailnoreply = $conf->global->$constforaltemailnoreply;
+			if (GETPOST('partner', 'alpha')) {
+				$tmpthirdparty = new Societe($db);
+				$result = $tmpthirdparty->fetch(GETPOST('partner', 'alpha'));
+				$logo = $tmpthirdparty->logo;
 			}
-
-			$to = $sellyoursaasemail;
-			$from = $sellyoursaasemailnoreply;
-			$email = new CMailFile('[Alert] Failed to deploy instance '.$generateddbhostname.' - '.dol_print_date(dol_now(), 'dayhourrfc'), $to, $from, join("\n",$errormessages)."\n", array(), array(), array(), $conf->global->SELLYOURSAAS_SUPERVISION_EMAIL, '', 0, 0, '', '', '', '', 'emailing');
-			$email->sendfile();
-            */
+			print '<img style="center" class="logoheader"  src="' . $linklogo . '" id="logo" />';
 			?>
-
-		  </section>
 		</div>
-	   </form>
-	   </div>
-</div>
+		<div class="block medium">
+
+			<header class="inverse">
+				<h1><?php echo $langs->trans("Registration") ?>
+					<small><?php echo($tmpproduct->label ? ' - ' . $tmpproduct->label : ''); ?></small></h1>
+			</header>
+
+
+			<form action="register_instance" method="post" id="formregister">
+				<div class="form-content">
+					<input type="hidden" name="token" value="<?php echo newToken(); ?>"/>
+					<input type="hidden" name="service" value="<?php echo dol_escape_htmltag($tmpproduct->ref); ?>"/>
+					<input type="hidden" name="extcss" value="<?php echo dol_escape_htmltag($extcss); ?>"/>
+					<input type="hidden" name="package" value="<?php echo dol_escape_htmltag($tmppackage->ref); ?>"/>
+					<input type="hidden" name="partner" value="<?php echo dol_escape_htmltag($partner); ?>"/>
+					<input type="hidden" name="disablecustomeremail"
+						   value="<?php echo dol_escape_htmltag($disablecustomeremail); ?>"/>
+
+					<section id="enterUserAccountDetails">
+
+						<center>OOPS...</center>
+						<?php
+						dol_print_error_email('DEPLOY' . $generateddbhostname, '', $errormessages, 'alert alert-error');
+						/*
+						$sellyoursaasname = $conf->global->SELLYOURSAAS_NAME;
+						$sellyoursaasemail = $conf->global->SELLYOURSAAS_SUPERVISION_EMAIL;
+						$sellyoursaasemailnoreply = $conf->global->SELLYOURSAAS_NOREPLY_EMAIL;
+
+						$domainname=getDomainFromURL($_SERVER['SERVER_NAME'], 1);
+						$constforaltname = 'SELLYOURSAAS_NAME_FORDOMAIN-'.$domainname;
+						$constforaltemailto = 'SELLYOURSAAS_SUPERVISION_EMAIL-'.$domainname;
+						$constforaltemailnoreply = 'SELLYOURSAAS_NOREPLY_EMAIL-'.$domainname;
+						if (! empty($conf->global->$constforaltname))
+						{
+							$sellyoursaasdomain = $domainname;
+							$sellyoursaasname = $conf->global->$constforaltname;
+							$sellyoursaasemail = $conf->global->$constforaltemailto;
+							$sellyoursaasemailnoreply = $conf->global->$constforaltemailnoreply;
+						}
+
+						$to = $sellyoursaasemail;
+						$from = $sellyoursaasemailnoreply;
+						$email = new CMailFile('[Alert] Failed to deploy instance '.$generateddbhostname.' - '.dol_print_date(dol_now(), 'dayhourrfc'), $to, $from, join("\n",$errormessages)."\n", array(), array(), array(), $conf->global->SELLYOURSAAS_SUPERVISION_EMAIL, '', 0, 0, '', '', '', '', 'emailing');
+						$email->sendfile();
+						*/
+						?>
+
+					</section>
+				</div>
+			</form>
+		</div>
+	</div>
 
 <?php
 llxFooter();
@@ -1644,13 +1586,14 @@ llxFooter();
  * @return string
  * @throws Exception
  */
-function randomAdalphanumericString($n){
-	$s='';
-	for($i=0;$i<$n;$i++){
-		$r=random_int(1,5);
-		if($r>3)$s.=chr(random_int(65,90));
-		elseif($r>1) $s.=chr(random_int(97,122));
-		else $s.=chr(random_int(48,57));
+function randomAdalphanumericString($n)
+{
+	$s = '';
+	for ($i = 0; $i < $n; $i++) {
+		$r = random_int(1, 5);
+		if ($r > 3) $s .= chr(random_int(65, 90));
+		elseif ($r > 1) $s .= chr(random_int(97, 122));
+		else $s .= chr(random_int(48, 57));
 	}
 	return $s;
 }
