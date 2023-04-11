@@ -114,6 +114,30 @@ $codevalid = str_replace(' ','+',GETPOST('codevalid'));
 $reusesocid = GETPOST('reusesocid', 'int');
 $plan = GETPOST('plan', 'alpha');
 $productref = (GETPOST('productref', 'alpha') ? GETPOST('productref', 'alpha') : ($plan ? $plan : ''));
+$action = GETPOST('action','alpha');
+$orgname = ucfirst(trim(GETPOST('orgName','alpha')));
+$email = trim(GETPOST('username','alpha'));
+$phone = trim(GETPOST('phone','alpha'));
+$domainemail = preg_replace('/^.*@/', '', $email);
+$password = trim(GETPOST('password','alpha'));
+$password2 = trim(GETPOST('password2','alpha'));
+$country_code = trim(GETPOST('address_country','alpha'));
+$sldAndSubdomain = trim(GETPOST('sldAndSubdomain','alpha'));
+$tldid = trim(GETPOST('tldid','alpha'));
+$optinmessages = (GETPOST('optinmessages','aZ09') == '1' ? 1 : 0);
+
+$origin = GETPOST('origin','aZ09');
+$partner=GETPOST('partner','int');
+$partnerkey=GETPOST('partnerkey','alpha');		// md5 of partner name_alias
+$custmourl = '';
+
+$fromsocid=GETPOST('fromsocid','int');
+$reusecontractid = GETPOST('reusecontractid','int');
+$disablecustomeremail = GETPOST('disablecustomeremail','alpha');
+
+$service=GETPOST('service','int');
+$productid=GETPOST('service','int');
+$extcss=GETPOST('extcss','alpha');
 if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && !empty($codevalid)) {
 
     //appel depuis url de création d'instance avec les paramètres reusesocid,codevalid et productref en get
@@ -139,35 +163,6 @@ if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION) && !emp
     $sldAndSubdomain = trim(ucfirst(strtolower(str_replace(' ', '', $orgname))));
     $tldid = '.'.$conf->global->SELLYOURSAAS_SUB_DOMAIN_NAMES;//A changer si plusieurs domaines de déploiement
     $optinmessages = $tmpsoc->array_options['options_optinmessages'];
-}
-
-else {
-
-    $action = GETPOST('action','alpha');
-    $orgname = ucfirst(trim(GETPOST('orgName','alpha')));
-    $email = trim(GETPOST('username','alpha'));
-    $phone = trim(GETPOST('phone','alpha'));
-    $domainemail = preg_replace('/^.*@/', '', $email);
-    $password = trim(GETPOST('password','alpha'));
-    $password2 = trim(GETPOST('password2','alpha'));
-    $country_code = trim(GETPOST('address_country','alpha'));
-    $sldAndSubdomain = trim(GETPOST('sldAndSubdomain','alpha'));
-    $tldid = trim(GETPOST('tldid','alpha'));
-    $optinmessages = (GETPOST('optinmessages','aZ09') == '1' ? 1 : 0);
-
-    $origin = GETPOST('origin','aZ09');
-    $partner=GETPOST('partner','int');
-    $partnerkey=GETPOST('partnerkey','alpha');		// md5 of partner name_alias
-    $custmourl = '';
-
-    $fromsocid=GETPOST('fromsocid','int');
-    $reusecontractid = GETPOST('reusecontractid','int');
-    $disablecustomeremail = GETPOST('disablecustomeremail','alpha');
-
-    $service=GETPOST('service','int');
-    $productid=GETPOST('service','int');
-    $extcss=GETPOST('extcss','alpha');
-
 }
 // If ran from command line
 if (substr($sapi_type, 0, 3) == 'cli') {
@@ -325,7 +320,7 @@ elseif ($reusesocid)		// When we use the "Add another instance" from myaccount d
 		exit(-1);
 	}
 }
-else                    // When we deploy from the register.php page
+else                    // When we deploy from the register.php page without SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION
 {
     // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
     $hookmanager->initHooks(array('sellyoursaas-register-instance'));
@@ -614,7 +609,8 @@ if ($reusecontractid)
 }
 else
 {
-    // Check number of instance with same IP deployed (Rem: for partners, ip are the one of their customer)
+	// Create thirdparty and contract with with generation of user and database names and passwords but without user nor database creation
+	// Check number of instance with same IP deployed (Rem: for partners, ip are the one of their customer)
     $MAXDEPLOYMENTPERIP = (empty($conf->global->SELLYOURSAAS_MAXDEPLOYMENTPERIP)?20:$conf->global->SELLYOURSAAS_MAXDEPLOYMENTPERIP);
 
     $nbofinstancewithsameip=-1;
@@ -808,6 +804,19 @@ else
 	$generateddbpassword = substr(getRandomPassword(true, array('I')), 0, 10);
 	$generateddbhostname = (! empty($conf->global->SELLYOURSAAS_FORCE_DATABASE_HOST) ? $conf->global->SELLYOURSAAS_FORCE_DATABASE_HOST : $sldAndSubdomain.'.'.$domainname);
 	$generateddbport = (! empty($conf->global->SELLYOURSAAS_FORCE_DATABASE_PORT) ? $conf->global->SELLYOURSAAS_FORCE_DATABASE_PORT : 3306);
+	$fp = @fopen('/etc/sellyoursaas.conf', 'r');
+	if ($fp) {
+		$array = explode("\n", fread($fp, filesize('/etc/sellyoursaas.conf')));
+		foreach ($array as $val) {
+			$tmpline=explode("=", $val);
+			if ($tmpline[0] == 'databasehostdeployment') {
+				$generateddbhostname = $tmpline[1];
+			}
+			elseif ($tmpline[0] == 'databaseportdeployment') {
+				$generateddbport = $tmpline[1];
+			}
+		}
+	}
 	$generatedunixhostname = $sldAndSubdomain.'.'.$domainname;
 
 	// Create thirdparty
