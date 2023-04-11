@@ -1156,8 +1156,8 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 	echo `date +%Y%m%d%H%M%S`" ***** Create database $dbname for user $dbusername"
 	
 	Q1="CREATE DATABASE IF NOT EXISTS $dbname CHARACTER SET utf8 COLLATE utf8_unicode_ci;; "
-	#Q2="CREATE USER IF NOT EXISTS '$dbusername'@'localhost' IDENTIFIED BY '$dbpassword'; "
-	Q2="CREATE USER '$dbusername'@'localhost' IDENTIFIED BY '$dbpassword'; "
+	#Q2="CREATE USER IF NOT EXISTS '$dbusername'@'$dbserverhost' IDENTIFIED BY '$dbpassword'; "
+	Q2="CREATE USER '$dbusername'@'$dbserverhost' IDENTIFIED BY '$dbpassword'; "
 	SQL="${Q1}${Q2}"
 	echo "$MYSQL -A -h $dbserverhost -P $dbserverport -u$dbadminuser -pXXXXXX -e \"$SQL\""
 	$MYSQL -A -h $dbserverhost -P $dbserverport -u$dbadminuser -p$dbadminpass -e "$SQL"
@@ -1169,7 +1169,7 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 	echo "$MYSQL -A -h $dbserverhost -P $dbserverport -u$dbadminuser -pXXXXXX -e \"$SQL\""
 	$MYSQL -A -h $dbserverhost -P $dbserverport -u$dbadminuser -p$dbadminpass -e "$SQL"
 	
-	Q1="GRANT CREATE,CREATE TEMPORARY TABLES,CREATE VIEW,DROP,DELETE,INSERT,SELECT,UPDATE,ALTER,INDEX,LOCK TABLES,REFERENCES,SHOW VIEW ON $dbname.* TO '$dbusername'@'localhost'; "
+	Q1="GRANT CREATE,CREATE TEMPORARY TABLES,CREATE VIEW,DROP,DELETE,INSERT,SELECT,UPDATE,ALTER,INDEX,LOCK TABLES,REFERENCES,SHOW VIEW ON $dbname.* TO '$dbusername'@'$dbserverhost'; "
 	Q2="GRANT CREATE,CREATE TEMPORARY TABLES,CREATE VIEW,DROP,DELETE,INSERT,SELECT,UPDATE,ALTER,INDEX,LOCK TABLES,REFERENCES,SHOW VIEW ON $dbname.* TO '$dbusername'@'%'; "
 	
 	if [ $dbforcesetpassword == "1" ]; then
@@ -1226,7 +1226,7 @@ if [[ "$mode" == "undeploy" || "$mode" == "undeployall" ]]; then
 
 	if [[ "x$?" == "x0" ]]; then
 		echo "Now drop the database & user"
-		echo "echo 'DROP DATABASE $dbname;DROP USER \'$dbusername\'@'%';DROP USER \'$dbusername\'@\'localhost\';' | $MYSQL -h $dbserverhost -P $dbserverport -u$dbadminuser -pXXXXXX $dbname"
+		echo "echo 'DROP DATABASE $dbname;DROP USER \'$dbusername\'@'%';DROP USER \'$dbusername\'@\'$dbserverhost\';' | $MYSQL -h $dbserverhost -P $dbserverport -u$dbadminuser -pXXXXXX $dbname"
 		if [[ $testorconfirm == "confirm" ]]; then
 			echo "DROP DATABASE $dbname;DROP USER $dbusername;" | $MYSQL -h $dbserverhost -P $dbserverport -u$dbadminuser -p$dbadminpass $dbname
 		fi
