@@ -874,7 +874,7 @@ else
 
         if (!empty($conf->global->SELLYOURSAAS_MAIL_CONFIRM_ON_ACCOUNT_CREATION))//Création du code de validation du nouveau client
         {
-            $codevalid = base64_encode(random_bytes(32));
+            $codevalid = randomAdalphanumericString(32);
             $tmpthirdparty->array_options['options_code_validation'] = $codevalid;
             $tmpthirdparty->array_options['options_oldpassword'] = $password;
         }
@@ -1638,3 +1638,19 @@ llxHeader($head, $title, '', '', 0, 0, array(), array('../dist/css/myaccount.css
 
 <?php
 llxFooter();
+
+/** Retourne une chaine aléatoire équitablement distribuée sur les majuscules,miniscules et chiffres
+ * @param $n
+ * @return string
+ * @throws Exception
+ */
+function randomAdalphanumericString($n){
+	$s='';
+	for($i=0;$i<$n;$i++){
+		$r=random_int(1,5);
+		if($r>3)$s.=chr(random_int(65,90));
+		elseif($r>1) $s.=chr(random_int(97,122));
+		else $s.=chr(random_int(48,57));
+	}
+	return $s;
+}
