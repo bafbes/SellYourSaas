@@ -803,7 +803,7 @@ else
 	$generateddbusername = 'dbu'.substr(getRandomPassword(true, array('I')), 0, 9);
 	$generateddbpassword = substr(getRandomPassword(true, array('I')), 0, 10);
 	$generateddbhostname = (! empty($conf->global->SELLYOURSAAS_FORCE_DATABASE_HOST) ? $conf->global->SELLYOURSAAS_FORCE_DATABASE_HOST : $sldAndSubdomain.'.'.$domainname);
-	$generateddbport = (! empty($conf->global->SELLYOURSAAS_FORCE_DATABASE_PORT) ? $conf->global->SELLYOURSAAS_FORCE_DATABASE_PORT : 3306);
+	$generateddbport = (! empty($conf->global->SELLYOURSAAS_FORCE_DATABASE_PORT) ? $conf->global->SELLYOURSAAS_FORCE_DATABASE_PORT : 3357);
 	$fp = @fopen('/etc/sellyoursaas.conf', 'r');
 	if ($fp) {
 		$array = explode("\n", fread($fp, filesize('/etc/sellyoursaas.conf')));
