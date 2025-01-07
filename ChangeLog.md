@@ -3,6 +3,9 @@
 
 ## Unreleased
 
+* NEW For payment mode credit transfer, an email is sent at invoice validation
+* NEW Can filter on instance mask when selecting target of email.
+* NEW Add info on ducs command
 * NEW Support discount codes with a number part (MYDISCOUNTCODE-123)
 * NEW Add hostname property in list of deployment servers  
 * NEW Add option SELLYOURSAAS_FORCE_NO_SELECTION_IF_SEVERAL

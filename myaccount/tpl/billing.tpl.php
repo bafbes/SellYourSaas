@@ -337,7 +337,7 @@ if ($mythirdpartyaccount->array_options['options_checkboxnonprofitorga'] != 'non
 				print '<tr>';
 				print '<td colspan="3" class="wordbreak">';
 				print '<!-- '.$companypaymentmodetemp->id.' -->';
-				print img_picto('', 'paypal');
+				print img_picto('', 'paypal', 'class="pictofixedwidth"');
 				print $langs->trans("Paypal");
 				print '</td>';
 				print '</tr>';
@@ -359,15 +359,15 @@ if ($mythirdpartyaccount->array_options['options_checkboxnonprofitorga'] != 'non
 			} elseif ($companypaymentmodetemp->type == 'ban') {
 				print '<tr>';
 				print '<td colspan="3" class="wordbreak">';
-				print img_picto('', 'bank', '', false, 0, 0, '', 'fa-2x');
+				print img_picto('', 'bank', 'class="pictofixedwidth"', false, 0, 0, '', '');
 				print $langs->trans("PaymentTypeShortPRE");
 				print '</td>';
 				print '</tr>';
 
 				print '<tr><td colspan="3">';
-				print $langs->trans("IBAN").': <span class="small">'.$companypaymentmodetemp->iban_prefix.'</span><br>';
+				print $langs->trans("IBAN").': <span class="small" title="'.$companypaymentmodetemp->iban_prefix.'">'.dol_trunc($companypaymentmodetemp->iban_prefix, 12, 'middle').'</span><br>';
 				if ($companypaymentmodetemp->rum) {
-					print $langs->trans("RUM").': <span class="small">'.$companypaymentmodetemp->rum.'</span>';
+					print $langs->trans("RUM").': <span class="small" title="'.$companypaymentmodetemp->rum.'">'.$companypaymentmodetemp->rum.'</span>';
 				}
 				print '</td></tr>';
 			} else {

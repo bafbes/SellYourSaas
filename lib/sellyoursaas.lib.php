@@ -484,7 +484,7 @@ function sellyoursaas_admin_prepare_head()
  */
 function getRemoteCheck($remoteip, $whitelisted, $email)
 {
-	global $conf;
+	global $conf, $db;
 
 	$vpnproba = '';
 	$ipquality = '';
@@ -500,7 +500,7 @@ function getRemoteCheck($remoteip, $whitelisted, $email)
 	dol_syslog("getRemoteCheck remoteip=".$remoteip." email=".$email." whitelisted=".$whitelisted, LOG_INFO);
 
 	// Check the captcha
-	if (getDolGlobalString('SELLYOURSAAS_GOOGLE_RECAPTCHA_ON')) {
+	if (getDolGlobalString('SELLYOURSAAS_GOOGLE_RECAPTCHA_ON') && $remoteip != '127.0.0.1') {
 		dol_syslog("getRemoteCheck Check using Google Recaptcha", LOG_DEBUG);
 
 		$grecaptcharesponse = GETPOST('g-recaptcha-response', 'alphanohtml');
@@ -588,7 +588,7 @@ function getRemoteCheck($remoteip, $whitelisted, $email)
 
 				if ($resultData["request_status"] == "ok" && $resultData["apikeystatus"] == "active" && $resultData["credits"] > "0") {
 					$request = 'https://api.block-disposable-email.com/easyapi/json/'.$apikey.'/'.$domaintocheck;
-					$result = getURLContent($request);
+					$resulturl = getURLContent($request);
 					$result = $resulturl['content'];
 					$resultData = json_decode($result, true);
 
@@ -605,26 +605,26 @@ function getRemoteCheck($remoteip, $whitelisted, $email)
 
 							// Output the key "Instance creation blocked for"
 							dol_syslog("ErrorEMailAddressBannedForSecurityReasons Instance creation blocked for email ".$emailtowarn);
-							$abusetest = 1;
+							$abusetest = 50; // blocked email with api
 						} else {
 							// Output the key "Instance creation blocked for"
 							dol_syslog("ErrorTechnicalErrorOccurredPleaseContactUsByEmail Instance creation blocked for email ".$emailtowarn);
-							$abusetest = 1;
+							$abusetest = 99; // technical error
 						}
 					} else {
 						// Output the key "Instance creation blocked for"
 						dol_syslog("ErrorTechnicalErrorOccurredPleaseContactUsByEmail Instance creation blocked for email ".$emailtowarn);
-						$abusetest = 1;
+						$abusetest = 98; // technical error
 					}
 				} else {
 					// Output the key "Instance creation blocked for"
 					dol_syslog("ErrorTechnicalErrorOccurredPleaseContactUsByEmail Instance creation blocked for email ".$emailtowarn);
-					$abusetest = 1;
+					$abusetest = 97; // customer api access error
 				}
 			} else {
 				// Output the key "Instance creation blocked for"
 				dol_syslog("ErrorEMailAddressBannedForSecurityReasons Instance creation blocked for email ".$emailtowarn);
-				$abusetest = 1;
+				$abusetest = 55; // blocked email in cache
 			}
 		}
 	}
@@ -824,7 +824,7 @@ function getRemoteCheck($remoteip, $whitelisted, $email)
 
 
 	// SELLYOURSAAS_BLACKLIST_IP_MASKS and SELLYOURSAAS_BLACKLIST_IP_MASKS_FOR_VPN are hidden constants.
-	// Deprecated. Check instead into the lList of blacklist ips in database. This is done at begin of page.
+	// Deprecated. Check instead into the list of blacklist ips in database. This is done at begin of page.
 
 	// Block for some IPs
 	if (!$whitelisted && empty($abusetest) && getDolGlobalString('SELLYOURSAAS_BLACKLIST_IP_MASKS')) {
@@ -994,4 +994,23 @@ function sellyoursaasGetNbUsersContract($contractref, $contractline, $codeextraf
 	dol_syslog("sellyoursaasGetNbUsersContract ret=".$ret);
 
 	return $ret;
+}
+
+/**
+ * Function to know if we are in trial, free mode or paid mode
+ * @param	Contrat		$contract				Contract
+ * @param	Societe		$mythirdpartyaccount	Thirdparty
+ * @return 	int									0 if trial mode, 1 if paid mode, 2 free mode
+ */
+function sellyoursaasGetModeStatusInstance($contract, $mythirdpartyaccount){
+	$modeinstancestatus = 0;
+	$ispaid = sellyoursaasIsPaidInstance($contract);
+	if ($ispaid) {
+		if ((empty($mythirdpartyaccount->array_options['options_checkboxnonprofitorga']) || $mythirdpartyaccount->array_options['options_checkboxnonprofitorga'] == 'nonprofit') && getDolGlobalInt("SELLYOURSAAS_ENABLE_FREE_PAYMENT_MODE")) {
+			$modeinstancestatus = 2;
+		} else {
+			$modeinstancestatus = 1;
+		}
+	}
+	return $modeinstancestatus;
 }

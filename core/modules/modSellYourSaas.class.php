@@ -14,6 +14,7 @@
  *      \brief      Description and activation file for module SellYourSaas
  */
 include_once DOL_DOCUMENT_ROOT ."/core/modules/DolibarrModules.class.php";
+include_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
 
 /**
@@ -81,7 +82,7 @@ class modSellYourSaas extends DolibarrModules
 									'hooks' => array('thirdpartycard','thirdpartycomm','thirdpartysupplier','thirdpartycontact','contactthirdparty','thirdpartyticket','thirdpartynote','thirdpartydocument','thirdpartypartnership',
 													'projectthirdparty','consumptionthirdparty','thirdpartybancard','thirdpartymargins','ticketlist','thirdpartynotification','agendathirdparty',
 													'thirdpartydao','formmail','searchform','thirdpartylist','customerlist','prospectlist','contractcard','contractdao','contractlist',
-													'pdfgeneration','odtgeneration','customreport'));
+													'pdfgeneration','odtgeneration','customreport','rowinterface'));
 
 		// Constants
 		// List of particular constants to add when module is enabled (key, 'chaine', value, 'desc', visible, 'current' or 'allentities', deleteonunactive)
@@ -103,6 +104,7 @@ class modSellYourSaas extends DolibarrModules
 			8=>array('SELLYOURSAAS_NBHOURSBETWEENTRIES', 'chaine', 49, 'Nb hours minium between each try', 1, 'current', 0),
 			9=>array('SELLYOURSAAS_NBDAYSBEFOREENDOFTRIES', 'chaine', 35, 'Nb days before stopping invoice payment try', 1, 'current', 0),
 			10=>array('AUDIT_ENABLE_PREFIX_SESSION', 'chaine', 1, 'Enable column prefix session in audit view', 1, 'current', 0),
+			11=>array('PRODUIT_SOUSPRODUITS', 'chaine', 1, 'Enable the feature of kit', 1, 'current', 0)
 		);
 
 		if (!isModEnabled("sellyoursaas")) {
@@ -229,21 +231,28 @@ class modSellYourSaas extends DolibarrModules
 		$this->rights[$r][1] = 'Read SellYourSaaS data';	// Permission label
 		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
 		$this->rights[$r][4] = 'read';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
-		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$this->rights[$r][5] = '';					// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$r++;
 
 		$this->rights[$r][0] = 101061; 				// Permission id (must not be already used)
 		$this->rights[$r][1] = 'Create/edit SellYourSaaS data (package, ...)';	// Permission label
 		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
 		$this->rights[$r][4] = 'write';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
-		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$this->rights[$r][5] = '';					// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$r++;
 
 		$this->rights[$r][0] = 101062; 				// Permission id (must not be already used)
+		$this->rights[$r][1] = 'Update end date of trial';	// Permission label
+		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
+		$this->rights[$r][4] = 'salesrepresentative';	// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$this->rights[$r][5] = 'write';					// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$r++;
+		
+		$this->rights[$r][0] = 101068; 				// Permission id (must not be already used)
 		$this->rights[$r][1] = 'Delete SellYourSaaS data (package, ...)';	// Permission label
 		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
-		$this->rights[$r][4] = 'delete';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
-		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$this->rights[$r][4] = 'delete';			// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$this->rights[$r][5] = '';					// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$r++;
 
 
@@ -752,12 +761,76 @@ class modSellYourSaas extends DolibarrModules
 	 */
 	public function init($options = '')
 	{
+		global $conf, $langs, $user;
+
 		$result = $this->_load_tables('/sellyoursaas/sql/');
 		if ($result <= 0) {
 			$this->error = 'Error in loading sql files';
 			return 0;
 		}
+		
+		$langs->load("sellyoursaas@sellyoursaas");
+		
+		// Create product category DefaultPOSCatLabel if not configured yet
+		$categories = new Categorie($this->db);
+		$cate_arbo = $categories->get_full_arbo('product', 0, 1);
+		if (is_array($cate_arbo)) {
+			if (!count($cate_arbo) || (!getDolGlobalString('SELLYOURSAAS_DEFAULT_PRODUCT_CATEG') || getDolGlobalString('SELLYOURSAAS_DEFAULT_PRODUCT_CATEG') == '-1')) {
+				$category = new Categorie($this->db);
 
+				$category->label = $langs->trans("DefaultSellYourSaasCatLabel");
+				$category->type = Categorie::TYPE_PRODUCT;
+
+				$result = $category->create($user);
+
+				if ($result > 0) {
+					dolibarr_set_const($this->db, 'SELLYOURSAAS_DEFAULT_PRODUCT_CATEG', $result, 'chaine', 0, 'Id of category for products sold with SellYourSaas', $conf->entity);
+
+					/* TODO Create a generic product only if there is no product yet. If 0 product,  we create 1. If there is already product, it is better to show a message to ask to add product in the category */
+					/*
+					$product = new Product($this->db);
+					$product->status = 1;
+					$product->ref = "takepos";
+					$product->label = $langs->trans("DefaultPOSProductLabel");
+					$product->create($user);
+					$product->setCategories($result);
+					 */
+				} else {
+					setEventMessages($category->error, $category->errors, 'errors');
+				}
+			}
+		}
+		
+		// Create product category DefaultSellYourSaasCustomerCatLabel if not configured yet
+		$categories = new Categorie($this->db);
+		$cate_arbo = $categories->get_full_arbo('customer', 0, 1);
+		if (is_array($cate_arbo)) {
+			if (!count($cate_arbo) || (!getDolGlobalString('SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG') || getDolGlobalString('SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG') == '-1')) {
+				$category = new Categorie($this->db);
+
+				$category->label = $langs->trans("DefaultSellYourSaasCustomerCatLabel");
+				$category->type = Categorie::TYPE_CUSTOMER;
+
+				$result = $category->create($user);
+
+				if ($result > 0) {
+					dolibarr_set_const($this->db, 'SELLYOURSAAS_DEFAULT_CUSTOMER_CATEG', $result, 'chaine', 0, 'Id of category for customers of SellYourSaas', $conf->entity);
+
+					/* TODO Create a generic product only if there is no product yet. If 0 product,  we create 1. If there is already product, it is better to show a message to ask to add product in the category */
+					/*
+					$product = new Product($this->db);
+					$product->status = 1;
+					$product->ref = "takepos";
+					$product->label = $langs->trans("DefaultPOSProductLabel");
+					$product->create($user);
+					$product->setCategories($result);
+					 */
+				} else {
+					setEventMessages($category->error, $category->errors, 'errors');
+				}
+			}
+		}
+		
 		// Create extrafields
 		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 		$extrafields = new ExtraFields($this->db);
@@ -857,7 +930,7 @@ class modSellYourSaas extends DolibarrModules
 		$resultx=$extrafields->addExtraField('hostname_os', "Hostname OS", 'varchar', 125, '128', 'contrat', 0, 0, '', '', 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$resultx=$extrafields->addExtraField('username_os', "Username OS", 'varchar', 126, '32', 'contrat', 1, 0, '', '', 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$param=array('options'=>array('dolcrypt'=>null));
-		$resultx=$extrafields->addExtraField('password_os', "Password OS", 'password', 127, '32', 'contrat', 0, 0, '', $param, 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
+		$resultx=$extrafields->addExtraField('password_os', "Password OS", 'password', 127, '128', 'contrat', 0, 0, '', $param, 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$param=array('options'=>array('0'=>'SystemDefault','1'=>'CommonUserJail','2'=>'PrivateUserJail'));
 
 		$resultx=$extrafields->addExtraField('sshaccesstype', "SshAccessType", 'select', 128, '', 'contrat', 0, 0, '', $param, 1, '', 'getDolGlobalInt("SELLYOURSAAS_SSH_JAILKIT_ENABLED")', 'HelpOnSshAccessType', '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
@@ -869,10 +942,10 @@ class modSellYourSaas extends DolibarrModules
 		$resultx=$extrafields->addExtraField('port_db', "Port DB", 'varchar', 132, '8', 'contrat', 0, 0, '', '', 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$resultx=$extrafields->addExtraField('username_db', "Username DB", 'varchar', 133, '32', 'contrat', 1, 0, '', '', 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$param=array('options'=>array('dolcrypt'=>null));
-		$resultx=$extrafields->addExtraField('password_db', "Password DB", 'password', 134, '64', 'contrat', 0, 0, '', $param, 1, '', -1, 'ToUpdateDBPassword:password_db', '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
+		$resultx=$extrafields->addExtraField('password_db', "Password DB", 'password', 134, '128', 'contrat', 0, 0, '', $param, 1, '', -1, 'ToUpdateDBPassword:password_db', '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$resultx=$extrafields->addExtraField('username_ro_db', "Read-only Username DB", 'varchar', 135, '32', 'contrat', 1, 0, '', '', 1, '', -1, 'ToCreateDBUserManualy:username_ro_db', '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$param=array('options'=>array('dolcrypt'=>null));
-		$resultx=$extrafields->addExtraField('password_ro_db', "Read-only Password DB", 'password', 136, '64', 'contrat', 0, 0, '', $param, 1, '', -1, 'ToUpdateDBPassword:password_ro_db', '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
+		$resultx=$extrafields->addExtraField('password_ro_db', "Read-only Password DB", 'password', 136, '128', 'contrat', 0, 0, '', $param, 1, '', -1, 'ToUpdateDBPassword:password_ro_db', '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$resultx=$extrafields->addExtraField('prefix_db', "Special table prefix DB", 'varchar', 140, '64', 'contrat', 0, 0, '', '', 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');
 		$resultx=$extrafields->addExtraField('timezone', "TimeZone", 'varchar', 141, '64', 'contrat', 0, 0, '', '', 1, '', -1, 'SellYourSaasTimeZoneDesc', '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")', 0, 0, array('csslist'=>'tdoverflowmax150'));
 		$resultx=$extrafields->addExtraField('fileauthorizekey', "DateFileauthorizekey", 'datetime', 150, '', 'contrat', 0, 0, '', '', 1, '', -1, 0, '', '', 'sellyoursaas@sellyoursaas', 'isModEnabled("sellyoursaas")');

@@ -40,10 +40,18 @@ phpfpm=`grep '^phpfpm=' /etc/sellyoursaas.conf | cut -d '=' -f 2`
 phpversion=`grep '^phpversion=' /etc/sellyoursaas.conf | cut -d '=' -f 2`
 localip=`grep '^localip=' /etc/sellyoursaas.conf | cut -d '=' -f 2`
 if [[ "x$templatesdir" != "x" ]]; then
-	export vhostfile="$templatesdir/vhostHttps-sellyoursaas.template"
-	export vhostfilesuspended="$templatesdir/vhostHttps-sellyoursaas-suspended.template"
-	export vhostfilemaintenance="$templatesdir/vhostHttps-sellyoursaas-maintenance.template"
-	export fpmpoolfiletemplate="$templatesdir/osuxxx.template"
+  if [[ "x$phpfpm" != "x" ]]; then
+    export vhostfile="$templatesdir/vhostHttps-phpfpm-sellyoursaas.template"
+    export vhostfilesuspended="$templatesdir/vhostHttps-phpfpm-sellyoursaas-suspended.template"
+    export vhostfilemaintenance="$templatesdir/vhostHttps-phpfpm-sellyoursaas-maintenance.template"
+    export fpmpoolfiletemplate="$templatesdir/phppool-phpfpm.template"
+    export fpmservicefiletemplate="$templatesdir/poolservice-phpfpm.template"
+  else
+    export vhostfile="$templatesdir/vhostHttps-sellyoursaas.template"
+    export vhostfilesuspended="$templatesdir/vhostHttps-sellyoursaas-suspended.template"
+    export vhostfilemaintenance="$templatesdir/vhostHttps-sellyoursaas-maintenance.template"
+    export fpmpoolfiletemplate="$templatesdir/osuxxx.template"
+  fi
 elif [[ "x$phpfpm" != "x" ]]; then
   export vhostfile="$scriptdir/templates/vhostHttps-phpfpm-sellyoursaas.template"
 	export vhostfilesuspended="$scriptdir/templates/vhostHttps-phpfpm-sellyoursaas-suspended.template"
@@ -1385,7 +1393,6 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 		echo `date +'%Y-%m-%d %H:%M:%S'`" ***** php-fpm service created. We start $phpfpmservice service"
 		systemctl daemon-reload
     systemctl enable $phpfpmservicename
-		systemctl daemon-reload
     systemctl restart $phpfpmservicename
 		if [[ "x$?" != "x0" ]]; then
 			echo Error when starting $phpfpmservicename
@@ -1593,7 +1600,15 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 
 	# Load dump file
 	echo `date +'%Y-%m-%d %H:%M:%S'`" Search dumpfile into $dirwithdumpfile"
-	for dumpfile in `ls $dirwithdumpfile/*.sql 2>/dev/null`
+	if [[ -s $dirwithdumpfile/.sellyoursaas.deploy.meta ]]; then
+		listoffiles=`cat $dirwithdumpfile/.sellyoursaas.deploy.meta 2>/dev/null`
+		echo `date +'%Y-%m-%d %H:%M:%S'`" list of sql files found into .sellyoursaas.deploy.meta: $listoffiles"
+	else
+		listoffiles=`ls -A -t $dirwithdumpfile/*.sql 2>/dev/null`
+		echo `date +'%Y-%m-%d %H:%M:%S'`" list of sql files found by a ls: $listoffiles"
+	fi
+	
+	for dumpfile in $listoffiles
 	do
 		echo "$MYSQL -A -h $dbserverhost -P $dbserverport -u$dbadminuser -pXXXXXX -D $dbname < $dumpfile"
 		$MYSQL -A -h $dbserverhost -P $dbserverport -u$dbadminuser -p$dbadminpass -D $dbname < $dumpfile

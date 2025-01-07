@@ -69,7 +69,7 @@ class SellYourSaasUtils
 	 */
 	public function doValidateDraftInvoices($restrictonthirdpartyid = 0, $maxtoprocess = 0)
 	{
-		global $conf, $langs, $user;
+		global $conf, $langs, $user, $mysoc;
 
 		$langs->load("agenda");
 
@@ -259,8 +259,9 @@ class SellYourSaasUtils
 
 									$codepaiementdirectdebit = 'PRE';
 									$codepaiementtransfer = 'VIR';
+									
 									if ($invoice->mode_reglement_code == $codepaiementdirectdebit || $invoice->mode_reglement_code == $codepaiementtransfer) {
-										// If invoice is an invoice to pay with a direct debit
+										// If customer invoice is an invoice to pay with a direct debit or is waiting a credit transfer
 										$enddatetoscan = dol_time_plus_duree($now, 20, 'd');
 
 										dol_syslog('Call sellyoursaasGetExpirationDate start', LOG_DEBUG, 1);
@@ -315,6 +316,7 @@ class SellYourSaasUtils
 													$actioncomm->authorid     = $user->id;   // User saving action
 													$actioncomm->userownerid  = $user->id;	// Owner of action
 													$actioncomm->fk_element   = $contract->id;
+													$actioncomm->elementid    = $contract->id;
 													$actioncomm->elementtype  = 'contract';
 													$actioncomm->note_private = $comment;
 
@@ -338,6 +340,123 @@ class SellYourSaasUtils
 												}
 											}
 										}
+
+										// Send email to customer (Note: we are in batch to validate invoice. For credit card payment, the email is sent by the batch that take the payment)
+										$sendemailtocustomer = 0;
+										$labeltouse = '';
+										$subject = '';
+										$msg = '';
+										if ($invoice->mode_reglement_code == $codepaiementtransfer) {
+											$sendemailtocustomer = 1;
+											$labeltouse = 'InvoicePaymentWaitingCreditTransfer';
+										}
+										
+										$object = $invoice;
+
+										if (!$errorforinvoice && $sendemailtocustomer && $labeltouse) {
+											dol_syslog("* Send email to inform about the invoice availability - ".$labeltouse);
+					
+											// Set output language
+											$outputlangs = new Translate('', $conf);
+											$outputlangs->setDefaultLang(empty($object->thirdparty->default_lang) ? $mysoc->default_lang : $object->thirdparty->default_lang);
+											$outputlangs->loadLangs(array("main", "members", "bills"));
+					
+											// Get email content from template
+											$arraydefaultmessage = null;
+					
+											include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
+											$formmail=new FormMail($this->db);
+
+											if (! empty($labeltouse)) {
+												$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'facture_send', $user, $outputlangs, 0, 1, $labeltouse);
+											}
+
+											if (! empty($labeltouse) && is_object($arraydefaultmessage) && $arraydefaultmessage->id > 0) {
+												$subject = $arraydefaultmessage->topic;
+												$msg     = $arraydefaultmessage->content;
+											}
+
+											$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
+
+											complete_substitutions_array($substitutionarray, $outputlangs, $object);
+					
+											// Set the property ->ref_customer with ref_customer of contract so __REF_CLIENT__ will be replaced in email content
+											// Search contract linked to invoice
+											$foundcontract = null;
+											$invoice->fetchObjectLinked(null, '', null, '', 'OR', 1, 'sourcetype', 1);
+
+											if (is_array($invoice->linkedObjects['contrat']) && count($invoice->linkedObjects['contrat']) > 0) {
+												//dol_sort_array($object->linkedObjects['facture'], 'date');
+												foreach ($invoice->linkedObjects['contrat'] as $idcontract => $contract) {
+													$substitutionarray['__CONTRACT_REF__']=$contract->ref_customer;
+													$substitutionarray['__REFCLIENT__']=$contract->ref_customer;	// For backward compatibility
+													$substitutionarray['__REF_CLIENT__']=$contract->ref_customer;
+													$substitutionarray['__REF_CUSTOMER__']=$contract->ref_customer;
+													$foundcontract = $contract;
+													break;
+												}
+											}
+
+											dol_syslog('__DIRECTDOWNLOAD_URL_INVOICE__='.$substitutionarray['__DIRECTDOWNLOAD_URL_INVOICE__']);
+					
+											$urlforsellyoursaasaccount = getRootUrlForAccount($foundcontract);
+											if ($urlforsellyoursaasaccount) {
+												$tmpforurl=preg_replace('/.*document.php/', '', $substitutionarray['__DIRECTDOWNLOAD_URL_INVOICE__']);
+												if ($tmpforurl) {
+													$substitutionarray['__DIRECTDOWNLOAD_URL_INVOICE__']=$urlforsellyoursaasaccount.'/source/document.php'.$tmpforurl;
+												} else {
+													$substitutionarray['__DIRECTDOWNLOAD_URL_INVOICE__']=$urlforsellyoursaasaccount;
+												}
+											}
+					
+											$subjecttosend = make_substitutions($subject, $substitutionarray, $outputlangs);
+											$texttosend = make_substitutions($msg, $substitutionarray, $outputlangs);
+					
+											// Attach a file ?
+											$file='';
+											$listofpaths=array();
+											$listofnames=array();
+											$listofmimes=array();
+											if (is_object($invoice)) {
+												$invoicediroutput = $conf->facture->dir_output;
+												$fileparams = dol_most_recent_file($invoicediroutput . '/' . $invoice->ref, preg_quote($invoice->ref, '/').'[^\-]+');
+												$file = $fileparams['fullname'];
+												$file = '';		// Disable attachment of invoice in emails
+					
+												if ($file) {
+													$listofpaths=array($file);
+													$listofnames=array(basename($file));
+													$listofmimes=array(dol_mimetype($file));
+												}
+											}
+											$from = getDolGlobalString('SELLYOURSAAS_NOREPLY_EMAIL');
+					
+											$trackid = 'inv'.$invoice->id;
+											$moreinheader = 'X-Dolibarr-Info: doValidateInvoice'."\r\n";
+											$addr_cc = '';
+											if (!empty($invoice->thirdparty->array_options['options_emailccinvoice'])) {
+												$addr_cc = $invoice->thirdparty->array_options['options_emailccinvoice'];
+											}
+					
+											// Send email (substitutionarray must be done just before this)
+											include_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
+											$mailfile = new CMailFile($subjecttosend, $invoice->thirdparty->email, $from, $texttosend, $listofpaths, $listofmimes, $listofnames, $addr_cc, '', 0, -1, '', '', $trackid, $moreinheader);
+											if (empty($mailfile->error) && $mailfile->sendfile()) {
+												$result = 1;
+											} else {
+												$errmsg = $langs->trans("ErrorFailedToSendMail", $from, $invoice->thirdparty->email).'. '.$mailfile->error;
+												
+												dol_syslog($errmsg, LOG_WARNING);
+												
+												$this->errors[] = $errmsg;
+												$result = -1;
+											}
+					
+											if ($result > 0) {
+												// TODO Add an event to say email was sent or the event invoice validate is enough ?
+											}
+										}
+															
 									}
 								}
 							}
@@ -1871,10 +1990,10 @@ class SellYourSaasUtils
 					} else {	// Else of the   if ($resultthirdparty > 0 && ! empty($customer)) {
 						if ($resultthirdparty <= 0) {
 							dol_syslog('SellYourSaasUtils Failed to load customer for thirdparty_id = '.$thirdparty->id, LOG_WARNING);
-							$this->errors[]='Failed to load customer for thirdparty_id = '.$thirdparty->id;
+							$this->errors[] = 'Failed to load customer for thirdparty_id = '.$thirdparty->id;
 						} else { // $customer stripe not found
 							dol_syslog('SellYourSaasUtils Failed to get Stripe customer id for thirdparty_id = '.$thirdparty->id." in mode ".$servicestatus." in Stripe env ".$stripearrayofkeysbyenv[$servicestatus]['publishable_key'], LOG_WARNING);
-							$this->errors[]='Failed to get Stripe customer id for thirdparty_id = '.$thirdparty->id." in mode ".$servicestatus." in Stripe env ".$stripearrayofkeysbyenv[$servicestatus]['publishable_key'];
+							$this->errors[] = 'Failed to get Stripe customer id for thirdparty_id = '.$thirdparty->id." in mode ".$servicestatus." in Stripe env ".$stripearrayofkeysbyenv[$servicestatus]['publishable_key'];
 						}
 						$error++;
 						$errorforinvoice++;
@@ -1897,7 +2016,7 @@ class SellYourSaasUtils
 					}
 
 
-					// Send email to customer + record action after
+					// Send email to customer (Note: we are in batch to take payment by credit card. For payment mode that waits credit transfer, email sis sent by batch that validate invoice)
 					if ($sendemailtocustomer && $labeltouse) {
 						dol_syslog("* Send email with result of payment - ".$labeltouse);
 
@@ -1906,7 +2025,7 @@ class SellYourSaasUtils
 						$outputlangs->setDefaultLang(empty($object->thirdparty->default_lang) ? $mysoc->default_lang : $object->thirdparty->default_lang);
 						$outputlangs->loadLangs(array("main", "members", "bills"));
 
-						// Get email content from templae
+						// Get email content from template
 						$arraydefaultmessage=null;
 
 						include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
@@ -1988,16 +2107,17 @@ class SellYourSaasUtils
 						// Send email (substitutionarray must be done just before this)
 						include_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 						$mailfile = new CMailFile($subjecttosend, $invoice->thirdparty->email, $from, $texttosend, $listofpaths, $listofmimes, $listofnames, $addr_cc, '', 0, -1, '', '', $trackid, $moreinheader);
-						if ($mailfile->sendfile()) {
+						if (empty($mailfile->error) && $mailfile->sendfile()) {
 							$result = 1;
 						} else {
-							$this->error=$langs->trans("ErrorFailedToSendMail", $from, $invoice->thirdparty->email).'. '.$mailfile->error;
+							$errmsg = $langs->trans("ErrorFailedToSendMail", $from, $invoice->thirdparty->email).'. '.$mailfile->error;
+							
+							$this->error = $errmsg;
 							$result = -1;
 						}
 
 						if ($result < 0) {
-							$errmsg=$this->error;
-							$postactionmessages[] = $errmsg;
+							$postactionmessages[] = $this->error;
 							$ispostactionok = -1;
 						} else {
 							if ($file) {
@@ -2008,6 +2128,7 @@ class SellYourSaasUtils
 						}
 					}
 
+					// Record event if we need to record it
 					if ($description) {
 						dol_syslog("* Record event for payment result - ".$description);
 
@@ -3247,7 +3368,7 @@ class SellYourSaasUtils
 							$conf->global->noapachereload = null;    // unset a global variable that can be read later by trigger
 							if ($result < 0) {
 								$error++;
-								$this->error = $object->error;
+								$this->error = $object->error.' ('.$object->ref.')';
 								if (is_array($object->errors) && count($object->errors)) {
 									if (is_array($this->errors)) {
 										$this->errors = array_merge($this->errors, $object->errors);
@@ -3646,7 +3767,7 @@ class SellYourSaasUtils
 										$titleofevent = dol_trunc($sellyoursaasname.' - '.gethostname().' - '.$langs->trans("PayingInstanceLost").': '.$tmpcontract->ref.' - '.$mythirdpartyaccount->name, 90);
 										$messageofevent = ' - '.$langs->trans("IPAddress").' '.getUserRemoteIP()."\n";
 										$messageofevent.= $langs->trans("PayingInstanceLost").': '.$tmpcontract->ref.' - '.$mythirdpartyaccount->name.' ['.$langs->trans("SeeOnBackoffice").']('.$urlwithouturlroot.'/societe/card.php?socid='.$mythirdpartyaccount->id.')'."\n";
-										$messageofevent.= 'Lost after cron job made a remoteaction='.$remotetouse."\n";
+										$messageofevent.= 'Lost after the cron job has made a remoteaction='.$remotetouse."\n";
 
 										// See https://docs.datadoghq.com/api/?lang=python#post-an-event
 										$statsd->event(
@@ -4381,6 +4502,22 @@ class SellYourSaasUtils
 						dol_syslog("No cli after paid file to create or no content");
 					}
 				}
+				if (in_array($remoteaction, array("deploy", "deployall"))) {
+					dol_syslog("Create meta file ".$tmppackage->datafile1."/sellyoursaas.deploy.meta");
+					$metadatadeploy = $tmppackage->datafile1."/.sellyoursaas.deploy.meta";
+					dol_delete_file($metadatadeploy, 0, 1, 0, null, false, 0);
+					$filearraydeploy = dol_dir_list_in_database('sellyoursaas/packages/'.$tmppackage->ref, '', '', 'position', SORT_ASC, 0, '(filename:like:%.sql)');
+					$strlistfile = "";
+					if (!empty($filearraydeploy)) {
+						foreach ($filearraydeploy as $key => $arr) {
+							$strlistfile .= $arr["fullname"]."\n";
+						}
+						$result = file_put_contents($metadatadeploy, $strlistfile);
+						@chmod($metadatadeploy, 0664);  // so user/group has "rw" ('admin' can delete if owner/group is 'admin' or 'www-data', 'root' can also read using nfs)
+					} else{
+						dol_syslog("No meta data file to creaaaate or no content ");
+					}
+				}
 				// Parameters for remote action
 				$commandurl = $generatedunixlogin.'&'.$generatedunixpassword.'&'.$sldAndSubdomain.'&'.$domainname;
 				$commandurl.= '&'.$generateddbname.'&'.$generateddbport.'&'.$generateddbusername.'&'.$generateddbpassword;
@@ -5103,8 +5240,6 @@ class SellYourSaasUtils
 	 */
 	public function getRemoteServerDeploymentIp($domainname, $onlyifopen = 0)
 	{
-		global $conf;
-
 		if (empty($domainname)) {
 			return '';
 		}

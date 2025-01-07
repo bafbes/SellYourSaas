@@ -94,9 +94,9 @@ class ActionsSellyoursaas
 				$object->fetch_optionals();
 				$conf->cache['thirdparty_options'][$object->id] = $object->array_options;
 			}
-
+			
 			$tmparray = $conf->cache['thirdparty_options'][$object->id];
-
+			
 			// Dashboard
 			if ($user->hasRight('sellyoursaas', 'read') && ! empty($tmparray['options_dolicloud'])) {
 				$url = '';
@@ -1631,5 +1631,45 @@ class ActionsSellyoursaas
 		}
 
 		return 0;
+	}
+
+	/**
+	 * Overloading the isLinkedDocumentObjectNotMovable function : check if we enable link document move
+	 *
+	 * @param   array           $parameters     Hook metadatas (context, etc...)
+	 * @param   string          $object         Current object (if set)
+	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
+	 * @return  int 		      			  	=0 if OK but we want to process standard code,
+	 *  	                            		>0 if OK and we want to replace standard codeS.
+	 */
+	public function isLinkedDocumentObjectNotMovable($parameters, &$object, $hookmanager)
+	{
+		global $user;
+		if (in_array($object->element, array("packages"))) {
+			$this->results['disablemove'] = 0;
+			return 1;
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Overloading the checkRowPerms function : check permission on an object
+	 *
+	 * @param   array           $parameters     Hook metadatas (context, etc...)
+	 * @param   string          $object         Current object (if set)
+	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
+	 * @return  int 		      			  	=0 if OK but we want to process standard code,
+	 *  	                            		>0 if OK and we want to replace standard codeS.
+	 */
+	public function checkRowPerms($parameters, &$object, $hookmanager)
+	{
+		global $user;
+		$res = 0;
+		if (in_array($parameters["fk_element"], array("no_parent_package"))) {
+			$this->results['perm'] = $user->hasRight('sellyoursaas', 'write');
+			$res = 1;
+		}
+		return $res;
 	}
 }
