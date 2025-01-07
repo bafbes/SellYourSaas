@@ -4192,6 +4192,10 @@ class SellYourSaasUtils
 				if ($contract->thirdparty->country_id > 0 && $contract->thirdparty->country_code && $contract->thirdparty->country) {
 					$countryidcodelabel=$contract->thirdparty->country_id.':'.$contract->thirdparty->country_code.':'.$contract->thirdparty->country;
 				}
+				$stateidcodelabel = '';
+				if ($contract->thirdparty->state_id > 0 && $contract->thirdparty->state_code && $contract->thirdparty->state) {
+					$stateidcodelabel=$contract->thirdparty->state_id.':'.$contract->thirdparty->state_code.':'.$contract->thirdparty->state;
+				}
 
 				$targetdir            = getDolGlobalString('DOLICLOUD_INSTANCES_PATH');
 				$archivedir           = getDolGlobalString('SELLYOURSAAS_TEST_ARCHIVES_PATH');
@@ -4297,6 +4301,13 @@ class SellYourSaasUtils
 					'__ALLOWOVERRIDE__'=>$tmppackage->allowoverride,
 					'__VIRTUALHOSTHEAD__'=>$customvirtualhostline,
 					'__SELLYOURSAAS_LOGIN_FOR_SUPPORT__'=>getDolGlobalString('SELLYOURSAAS_LOGIN_FOR_SUPPORT'),
+                    '__APPSTATEIDCODELABEL__'=> $stateidcodelabel,
+                    '__APPADDRESS__'=> $contract->thirdparty->address,
+                    '__APPTOWN__'=> $contract->thirdparty->town,
+                    '__APPZIP__'=> $contract->thirdparty->zip,
+                    '__APPTEL__'=> $contract->thirdparty->phone,
+                    '__APPWEB__'=> $contract->thirdparty->url,
+                    '__APPLEGALSTATUS__'=> $contract->thirdparty->forme_juridique,
 				);
 
 				// If a given timezone was set for contract/instance
