@@ -166,9 +166,123 @@ if (!getDolGlobalString('MAIN_DISABLEVATCHECK') && $mythirdpartyaccount->isInEEC
 	            </form>
 	            <!-- END FORM DIV -->
 	           </div> <!-- END PORTLET-BODY -->
-            </div>
-';
+	           </div>';
+if(getDolGlobalInt('SELLYOURSAAS_ACCOUNT_SHOW_LOGO_SECTION')) {
+     $confirm 	= GETPOST('confirm');
+     $permissiontoadd=1;
+    $langs->load("link");
+    if (empty($relativepathwithnofile)) {
+        $relativepathwithnofile = '';
+    }
 
+// Set $permission from the $permissiontoadd var defined on calling page
+    if (!isset($permission)) {
+        $permission = $permissiontoadd;
+    }
+    if (!isset($permtoedit)) {
+        $permtoedit = $permissiontoadd;
+    }
+    if (!isset($param)) {
+        $param = '';
+    }
+
+// Drag and drop for up and down allowed on product, thirdparty, ...
+// The drag and drop call the page core/ajax/row.php
+// If you enable the move up/down of files here, check that page that include template set its sortorder on 'position_name' instead of 'name'
+// Also the object->fk_element must be defined.
+    $disablemove = 1;
+    if (in_array($modulepart, array('product', 'produit', 'societe', 'user', 'ticket', 'holiday', 'expensereport'))) {
+        $disablemove = 0;
+    }
+
+
+
+    /*
+     * Confirm form to delete a file
+     */
+
+    if ($action == 'deletefile' || $action == 'deletelink') {
+        $langs->load("companies"); // Need for string DeleteFile+ConfirmDeleteFiles
+        print $form->formconfirm(
+            $_SERVER["PHP_SELF"].'?mode=myaccount&id='.$mythirdpartyaccount->id.'&urlfile='.urlencode(GETPOST("urlfile")).'&linkid='
+            .GETPOSTINT('linkid').(empty($param) ? '' : $param),
+            $langs->trans('DeleteFile'),
+            $langs->trans('ConfirmDeleteFile'),
+            'confirm_deletefile',
+            '',
+            '',
+            1
+        );
+    }
+    echo '	  <br>
+	        <div class="portlet light">
+	      <div class="portlet-title">
+	            <div class="caption-subject font-green-sharp bold uppercase">'.$langs->trans("Logo").'</div>
+	      </div>
+    <div class="portlet-body">';
+
+	$upload_dir = $conf->societe->multidir_output[$mythirdpartyaccount->entity]."/".$mythirdpartyaccount->id;
+	$courrier_dir = $conf->societe->multidir_output[$mythirdpartyaccount->entity]."/courrier/".get_exdir($mythirdpartyaccount->id, 0, 0, 0, $mythirdpartyaccount, 'thirdparty');
+
+    require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+    include DOL_DOCUMENT_ROOT.'/core/actions_linkedfiles.inc.php';
+    $totalsize = 0;
+    $filearray = dol_dir_list($upload_dir, "files", 0, '', '(\.meta|_preview.*\.png)$', '', SORT_ASC, 1);
+    foreach ($filearray as $key => $file) {
+        $totalsize += $file['size'];
+    }
+    $formfile = new FormFile($db);
+    $out = $formfile->form_attach_new_file(
+        $_SERVER["PHP_SELF"] . '?id=' . $mythirdpartyaccount->id,
+        '',
+        0,
+        0,
+        1,
+        $conf->browser->layout == 'phone' ? 40 : 60,
+        $mythirdpartyaccount,
+        '',
+        1,
+        0,
+        0,
+        'formuserfile',
+        '',
+        '',
+        0,
+        0,
+        0,
+        1
+    );
+    $out =str_replace('minwidth400', 'minwidth20', $out);
+    $out =str_replace('/index.php?', '/index.php?mode=myaccount&', $out);
+    echo $out;
+// List of document
+    ob_start();
+    $formfile->list_of_documents(
+        $filearray,
+        $mythirdpartyaccount,
+        '',
+        '',
+        0,
+        '', // relative path with no file. For example "0/1"
+        1,
+        0,
+        '',
+        0,
+        '',
+        '',
+        0,
+        1,
+        '',
+        '',
+        '',
+        1
+    );
+    $out = str_replace('/index.php?', '/index.php?mode=myaccount&', ob_get_clean());
+    echo $out;
+
+    echo '</div></div>';
+
+}
 if (! GETPOST('deleteaccount') && ($mythirdpartyaccount->array_options['options_checkboxnonprofitorga'] != 'nonprofit' || !getDolGlobalInt("SELLYOURSAAS_ENABLE_FREE_PAYMENT_MODE"))) {
 	print '<div class="center"><br>';
 	$urltoenterpaymentmode = $_SERVER["PHP_SELF"].'?mode=registerpaymentmode&backtourl='.urlencode($_SERVER["PHP_SELF"].'?mode='.$mode);
