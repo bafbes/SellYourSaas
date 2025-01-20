@@ -3295,16 +3295,22 @@ if (empty($welcomecid) && ! in_array($action, array('instanceverification', 'aut
 	}
 }
 
-
-// Include mode with php template
-if (! empty($mode)) {
-	$fullpath = dol_buildpath("/sellyoursaas/myaccount/tpl/".$mode.".tpl.php");
-	if (file_exists($fullpath)) {
-		include $fullpath;
-	}
+$parameters = array('topcontext' => get_defined_vars());
+$reshook = $hookmanager->executeHooks('loadTpl', $parameters, $mythirdpartyaccount, $action); // Note that $action and
+// $object may have been modified by some hooks
+if ($reshook < 0) {
+    setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 }
 
-
+if (empty($reshook)) {
+// Include mode with php template
+    if (!empty($mode)) {
+        $fullpath = dol_buildpath("/sellyoursaas/myaccount/tpl/" . $mode . ".tpl.php");
+        if (file_exists($fullpath)) {
+            include $fullpath;
+        }
+    }
+}
 print '
 	</div>
 
