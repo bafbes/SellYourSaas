@@ -1510,8 +1510,8 @@ if (! $error) {
 	} else {
 		$_SESSION['dol_loginsellyoursaas']=$contract->thirdparty->id;
 	}
-
-	$_SESSION['initialapplogin']='admin';
+    $login=getDolGlobalString('SELLYOURSAAS_INSTANCE_LOGIN');
+	$_SESSION['initialapplogin']=!empty($login)?$login:'admin';
 	$_SESSION['initialapppassword']=$password;
 
 	if (! $disablecustomeremail) {	// In most cases this test is true

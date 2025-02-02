@@ -898,3 +898,4 @@ DefaultFromAppService=Utiliser la valeur dans la configuration du service
 SelectAServer=Sélectionnez un serveur...
 SELLYOURSAAS_FORCE_NO_SELECTION_IF_SEVERAL=Désactiver la suggestion automatique d'un serveur
 SELLYOURSAAS_FORCE_NO_SELECTION_IF_SEVERALHelp=Par défaut, le système propose un serveur (sélectionné aléatoirement parmi les serveurs du même pays, puis parmi d'autres). Vous pouvez désactiver l'autosuggestion pour forcer l'utilisateur à sélectionner un serveur.
+SELLYOURSAAS_INSTANCE_LOGIN= Login de l'utilisateur d'instance initial

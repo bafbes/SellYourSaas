@@ -178,6 +178,7 @@ if ($action == 'set') {
 
 		dolibarr_set_const($db, "SELLYOURSAAS_SSH2_HOSTKEYALGO", GETPOST("SELLYOURSAAS_SSH2_HOSTKEYALGO", 'alpha'), 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "SELLYOURSAAS_SSH2_KEXALGO", GETPOST("SELLYOURSAAS_SSH2_KEXALGO", 'alpha'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "SELLYOURSAAS_INSTANCE_LOGIN", GETPOST("SELLYOURSAAS_INSTANCE_LOGIN", 'alpha'), 'chaine', 0, '', $conf->entity);
 	}
 	if (! $error) {
 		setEventMessages($langs->trans("SetupSaved"), null, 'mesgs');
@@ -257,6 +258,12 @@ print '</td>';
 print '<td></td>';
 print '</tr>';
 
+print '<tr class="oddeven"><td>'.$langs->trans("SELLYOURSAAS_INSTANCE_LOGIN").'</td>';
+print '<td>';
+print '<input class="minwidth300" type="text" name="SELLYOURSAAS_INSTANCE_LOGIN" value="'.getDolGlobalString('SELLYOURSAAS_INSTANCE_LOGIN').'">';
+print '</td>';
+print '<td><span class="opacitymedium small">admin</span></td>';
+print '</tr>';
 
 
 // Google recaptcha
