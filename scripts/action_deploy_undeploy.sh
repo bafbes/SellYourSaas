@@ -1450,10 +1450,10 @@ if [[ "$mode" == "deploy" || "$mode" == "deployall" ]]; then
 		Q2a="GRANT FLUSH_TABLES ON *.* TO '$dbusername'@'localhost'; "
 		Q2b="GRANT FLUSH_TABLES ON *.* TO '$dbusername'@'%'; "
 
-		# For all mysql
-		Q3="SET PASSWORD FOR '$dbusername' = PASSWORD('$dbpassword'); "
-		Q3a="SET PASSWORD FOR '$dbusername'@'localhost' = PASSWORD('$dbpassword'); "
-		Q3b="SET PASSWORD FOR '$dbusername'@'%' = PASSWORD('$dbpassword'); "
+		# For mysql 5.7.6+, PASSWORD() does not exist for mysql 8.0.34 +
+    Q3="ALTER USER '$dbusername' IDENTIFIED BY '$dbpassword';"
+    Q3a="ALTER USER '$dbusername'@'localhost' IDENTIFIED BY '$dbpassword';"
+    Q3b="ALTER USER '$dbusername'@'%' IDENTIFIED BY '$dbpassword';"
 	fi
 	
 	Q4="FLUSH PRIVILEGES; "
