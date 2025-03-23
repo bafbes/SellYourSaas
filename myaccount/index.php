@@ -252,7 +252,7 @@ if ($resql) {
 }
 
 $mythirdpartyaccount->isareseller = 0;
-if ($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG > 0) {
+if (isset($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG ) && $conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG> 0) {
 	$categorie=new Categorie($db);
 	$categorie->fetch($conf->global->SELLYOURSAAS_DEFAULT_RESELLER_CATEG);
 	if ($categorie->containsObject('supplier', $mythirdpartyaccount->id) > 0) {
